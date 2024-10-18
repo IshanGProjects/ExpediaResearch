@@ -1,6 +1,6 @@
 ![EG_CompleteLogo_Blue-on-Transparent_04-27-2023](https://github.com/user-attachments/assets/38867f73-fc91-41b9-b62b-d8eac337145d)
 
-# Running the ExpediaResearch Setup with Docker: A Guide
+# Running the ExpediaResearch Setup with Docker: 
 
 ## Prerequisites
 
