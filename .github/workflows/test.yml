@@ -41,11 +41,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      - name: Debug initial Docker status
+        run: |
+          echo "Listing active Docker containers:"
+          docker ps
+          echo "Listing active network ports:"
+          sudo lsof -i -P -n | grep LISTEN
+
       - name: Build and run containers
         run: |
           docker-compose -f docker-compose.yml up --build -d
         env:
           EXPRESS_PORT: ${{ secrets.EXPRESS_PORT }}
+
+      - name: Debug post-setup Docker status
+        run: |
+          echo "Listing active Docker containers after setup:"
+          docker ps
+          echo "Listing active network ports after setup:"
+          sudo lsof -i -P -n | grep LISTEN
 
       - name: Run tests
         run: docker-compose -f docker-compose.yml exec server npm test
@@ -55,3 +69,4 @@ jobs:
       - name: Clean up
         if: always()
         run: docker-compose down
+        continue-on-error: true
