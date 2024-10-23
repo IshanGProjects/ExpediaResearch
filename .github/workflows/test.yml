@@ -46,7 +46,6 @@ jobs:
           docker-compose -f docker-compose.yml up --build -d
         env:
           EXPRESS_PORT: ${{ secrets.EXPRESS_PORT }}
-          REACT_APP_SERVER_PORT: ${{ secrets.REACT_APP_SERVER_PORT }}
 
       - name: Run tests
         run: docker-compose -f docker-compose.yml exec server npm test
