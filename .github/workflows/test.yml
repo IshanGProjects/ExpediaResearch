@@ -1,0 +1,51 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:19.03.12-dind
+        options: --privileged
+        ports:
+          - 3000:3000
+          - 8000:8000
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build and run containers
+        run: |
+          docker-compose -f docker-compose.yml up --build -d
+        env:
+          EXPRESS_PORT: ${{ secrets.EXPRESS_PORT }}
+      - name: Run tests
+        run: docker-compose -f docker-compose.yml exec server npm test
+        env:
+          EXPRESS_PORT: ${{ secrets.EXPRESS_PORT }}
+
+      - name: Clean up
+        if: always()
+        run: docker-compose down
