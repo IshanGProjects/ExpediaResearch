@@ -5,7 +5,7 @@ const SampleComponent: React.FC = () => {
   const fetchData = async (): Promise<void> => {
     try {
       console.log("Attempting to fetch data...");
-      const response = await axios.get<string>("http://localhost:8000/test"); // TypeScript expects the response to be a string
+      const response = await axios.get<string>("http://localhost:8001/test"); // TypeScript expects the response to be a string
       console.log("Server Response:", response.data); // Axios response body is in 'data'
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

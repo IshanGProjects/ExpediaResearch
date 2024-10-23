@@ -18,8 +18,8 @@ jobs:
         image: docker:19.03.12-dind
         options: --privileged
         ports:
-          - 3000:3000
-          - 8000:8000
+          - 3001:3000
+          - 8001:8000
 
     steps:
       - name: Check out code
@@ -53,7 +53,7 @@ jobs:
           EXPRESS_PORT: ${{ secrets.EXPRESS_PORT }}
 
       - name: Run tests
-        run: docker-compose -f docker-compose.yml exec server npm test
+        run: docker-compose -f docker-compose.yml exec client npm test
         env:
           EXPRESS_PORT: ${{ secrets.EXPRESS_PORT }}
 

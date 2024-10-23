@@ -1,0 +1,23 @@
+{
+  "name": "Server DevContainer",
+  "dockerComposeFile": ["../../docker-compose.yml"],  // Adjusted to go two directories up
+  "service": "server",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "johnpapa.vscode-peacock"
+      ],
+      "settings": {
+        "peacock.remoteColor": "#0000FF",  // Blue color for server
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "postCreateCommand": "npm install",
+  "remoteEnv": {
+    "PORT": "8001"
+  }
+}

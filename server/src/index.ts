@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 
 // Start the server, ensuring that the port is properly typed
-const port = Number(process.env.EXPRESS_PORT) || 8000;
+const port = Number(process.env.EXPRESS_PORT) || 8001;
 
 app.listen(port, () => {
   console.log(`App server now listening on port ${port}`);
