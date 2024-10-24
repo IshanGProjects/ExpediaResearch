@@ -14,8 +14,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     services:
-      docker:
-
+      docker: 4000:4000
     steps:
       - name: Check out code
         uses: actions/checkout@v2

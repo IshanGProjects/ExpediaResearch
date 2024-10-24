@@ -1,7 +1,7 @@
 version: "3.4"
 
 x-common-variables: &common-variables
-  REACT_APP_SERVER_PORT: 8001
+  REACT_APP_SERVER_PORT: 8000
 
 services:
   server:
@@ -9,7 +9,7 @@ services:
     expose:
       - 8000
     ports:
-      - 8001:8000
+      - 8000:8000
     volumes:
       - ./server:/app
     command: npm run dev
@@ -21,7 +21,7 @@ services:
     expose:
       - 3000
     ports:
-      - 3001:3000
+      - 3000:3000
     volumes:
       - ./client/src:/app/src
     links:
