@@ -18,6 +18,6 @@
     },
     "postCreateCommand": "npm install",
     "remoteEnv": {
-      "REACT_APP_SERVER_PORT": "8001"
+      "REACT_APP_SERVER_PORT": "8000"
     }
   }
