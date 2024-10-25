@@ -9,6 +9,5 @@ module.exports = {
       '/node_modules/(?!axios)/',   // Don't ignore transforming axios or other ES modules
     ],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-    setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   };
   
