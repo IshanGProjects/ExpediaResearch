@@ -24,6 +24,7 @@ const SampleComponent: React.FC = () => {
   return (
     <div className="SampleComponent">
       <h1>Sample Component</h1>
+      <h2>front end exmaple change</h2>
     </div>
   );
 };
