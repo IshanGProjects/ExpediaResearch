@@ -17,8 +17,6 @@ jobs:
       docker:
         image: docker:19.03.12-dind
         options: --privileged
-        # Removed the ports section entirely
-
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -49,7 +47,7 @@ jobs:
           docker-compose -f docker-compose.yml up --build -d
 
       - name: Run tests
-        run: docker-compose exec -T client npm test
+        run: docker-compose exec -T client npm run test:ci
 
       - name: Post-test diagnostics
         run: |
