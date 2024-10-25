@@ -23,7 +23,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "test:ci": "jest --ci --runInBand",
+    "test:ci": "jest --ci --runInBand --detectOpenHandles",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -48,7 +48,9 @@
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.5.4",
+    "babel-jest": "^26.6.0",
     "install": "^0.13.0",
+    "jest-environment-jsdom": "^29.7.0",
     "npm": "^10.8.3",
     "ts-jest": "^29.2.5"
   }
