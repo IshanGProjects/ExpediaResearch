@@ -49,7 +49,7 @@ jobs:
           docker-compose -f docker-compose.yml up --build -d
 
       - name: Run tests
-        run: docker-compose -f docker-compose.yml exec client npm test
+        run: docker-compose exec -T client npm test
 
       - name: Post-test diagnostics
         run: |
