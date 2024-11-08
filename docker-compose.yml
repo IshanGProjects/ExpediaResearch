@@ -13,6 +13,9 @@ services:
     volumes:
       - ./server:/app
     command: npm run dev
+    depends_on:
+      - vectordb
+
   client:
     build: ./client
     environment:
@@ -27,3 +30,15 @@ services:
     links:
       - server
     command: npm run start
+
+  vectordb:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    environment:
+      QDRANT__STORAGE__DISK_CACHE: "1" # Enable disk cache for performance
+
+volumes:
+  qdrant_storage:
