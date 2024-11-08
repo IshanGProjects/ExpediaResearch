@@ -1,7 +1,5 @@
 **/node_modules
 **/node_modules
-**/node_modules
-**/node_modules
-**/.env
+.env
 .vscode
-.vscode
+data-generation/api_results.json
