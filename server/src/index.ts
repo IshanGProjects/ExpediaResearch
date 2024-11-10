@@ -2,7 +2,8 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 import axios from 'axios';
 import process from 'process';
-import { checkQdrantStatus } from './qdrantHandler'
+import { checkQdrantStatus } from './qdrantHandler';
+import { embeddingPromptHandler } from './embedPromptHandler';
 
 const app = express();
 
@@ -21,7 +22,8 @@ app.get('/test', (req: Request, res: Response) => {
   res.send('Server check verified');
 });
 
-
+// Endpoint to generate embeddings
+app.post('/generate-embedding', embeddingPromptHandler);
 
 // Qdrant validation endpoint
 app.get('/qdrant-test', checkQdrantStatus);

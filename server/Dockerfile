@@ -16,4 +16,5 @@ VOLUME /app/node_modules
 # Copy the rest of the application code to the working directory
 COPY . .
 
+
 CMD ["npm", "run dev"]

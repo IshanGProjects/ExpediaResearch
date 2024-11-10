@@ -6,6 +6,9 @@ x-common-variables: &common-variables
 services:
   server:
     build: ./server
+    environment:
+      <<: *common-variables
+      NODE_ENV: development
     expose:
       - 8000
     ports:
