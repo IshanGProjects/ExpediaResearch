@@ -26,7 +26,7 @@ app.get('/test', (req: Request, res: Response) => {
 });
 
 // OpenAI API route
-app.post("/api/extract-keywords", async (req, res) => {
+app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<any> => {
   const userPrompt = req.body.prompt;
 
   try {
@@ -35,18 +35,35 @@ app.post("/api/extract-keywords", async (req, res) => {
       messages: [
         {
           role: "user",
-          content: `Extract travel-related keywords from the following prompt: "${userPrompt}".`,
+          content: `Please analyze the following user prompt: "${userPrompt}". Extract any travel-related keywords and respond in JSON format, following this structure:
+                    {
+                      "location": "Extracted location if any like state, country, otherwise leave empty",
+                      "time": "Extracted time or date if any, otherwise leave empty",
+                      "activities": "Extracted activities or things to do if any, otherwise leave empty"
+                    }.
+                    Respond only in JSON format, without additional text.`,
         },
       ],
     });
 
-
-    const keywords = response.choices[0].message.content;
+    let keywords;
+    const content = response.choices[0].message.content;
+    if (content) {
+      try {
+        const keywords = JSON.parse(content);
+        return res.json({ keywords });
+      } catch (error) {
+        console.log("Error in parsing JSON: ", error);
+        return res
+          .status(500)
+          .json({ error: "Failed to parse JSON from OpenAI response." });
+      }
+    }
 
     res.json({ keywords });
   } catch (error) {
-    console.log("Error in extracting keywords: ", error);
-    res.status(500).json({ error: "Failed to extract keywords" });
+    console.error("Error in extracting keywords: ", error);
+    return res.status(500).json({ error: "Failed to extract keywords" });
   }
 });
 

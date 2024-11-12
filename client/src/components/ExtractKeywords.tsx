@@ -1,9 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
 
+interface Keywords {
+  location?: string | string[];
+  time?: string | string[];
+  activities?: string | string[];
+}
+
 const ExtractKeywords = () => {
   const [userPrompt, setUserPrompt] = useState("");
-  const [keywords, setKeywords] = useState([]);
+  const [keywords, setKeywords] = useState<Keywords | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,7 +51,15 @@ const ExtractKeywords = () => {
       {keywords && (
         <div>
           <h2>Extracted Keywords:</h2>
-          <pre>{JSON.stringify(keywords, null, 2)}</pre>
+          {/* <pre>{JSON.stringify(keywords, null, 2)}</pre> */}
+          <ul>
+            {Object.entries(keywords).map(([key, value]) => (
+              <li key={key}>
+                <strong>{key}:</strong>{" "}
+                {Array.isArray(value) ? value.join(", ") : value || "N/A"}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
