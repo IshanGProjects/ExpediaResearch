@@ -11,7 +11,8 @@ app.use(cors());
 
 // Initialize OpenAI API with API key
 const openai = new OpenAIApi({
-  apiKey: process.env.OPENAI_API_KEY, // add a key to .env file from group openai account
+  // apiKey: process.env.OPENAI_API_KEY, // add a key to .env file from group openai account
+  apiKey: "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"
 });
 
 // Start the server, ensuring that the port is properly typed
@@ -27,11 +28,11 @@ app.get('/test', (req: Request, res: Response) => {
 
 // OpenAI API route
 app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<any> => {
-  const userPrompt = req.body.prompt;
+  const userPrompt = req.body.userPrompt;
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // Use the appropriate model
+      model: "gpt-4o", // Use the appropriate model
       messages: [
         {
           role: "user",
@@ -47,9 +48,10 @@ app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<a
     });
 
     let keywords;
-    const content = response.choices[0].message.content;
+    let content = response.choices[0].message.content;
     if (content) {
       try {
+        content = content.replace(/```json|```/g, "").trim();
         const keywords = JSON.parse(content);
         return res.json({ keywords });
       } catch (error) {
