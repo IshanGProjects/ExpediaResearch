@@ -62,7 +62,7 @@ export async function storeEmbedding(vector: number[], payload: Record<string, a
     await ensureCollectionExists();
 
     // Insert the embedding
-    const response = await axios.post(endpoint, body, {
+    const response = await axios.put(endpoint, body, {
       headers: { 'Content-Type': 'application/json' },
     });
 
