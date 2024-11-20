@@ -1,8 +1,12 @@
 import OpenAI from 'openai';
+import process from 'process';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+  apiKey: process.env.OPENAI_API_KEY,
+});
   
   /**
    * Generates an embedding for a given prompt using the ada-embedding model.
@@ -10,8 +14,6 @@ const openai = new OpenAI({
    * @returns A Promise that resolves to the embedding array.
    */
   export async function createEmbedding(prompt: string): Promise<number[]> {
-
-    console.log("api key", process.env.OPENAI_API_KEY)
 
     try {
       const response = await openai.embeddings.create({
