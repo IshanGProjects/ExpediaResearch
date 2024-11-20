@@ -7,7 +7,7 @@ const COLLECTION_NAME = 'embeddings';
 /**
  * Ensure the collection exists in the Qdrant database. Creates it if missing.
  */
-async function ensureCollectionExists(): Promise<void> {
+export async function ensureCollectionExists(): Promise<void> {
   const endpoint = `${QDRANT_URL}/collections/${COLLECTION_NAME}`;
   try {
     await axios.get(endpoint);

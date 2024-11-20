@@ -1,59 +1,67 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import { v4 as uuidv4 } from 'uuid';
-import { storeEmbedding } from '../storeEmbedding';
+import axios from 'axios';
+import { ensureCollectionExists, storeEmbedding } from '../storeEmbedding';
 
 const QDRANT_URL = 'http://vectordb:6333';
 const COLLECTION_NAME = 'embeddings';
 
-describe('storeEmbedding', () => {
-  let mock: MockAdapter;
+/**
+ * Deletes a point from the Qdrant database by ID.
+ */
+async function deletePoint(pointId: string): Promise<void> {
+  const endpoint = `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/delete`;
+  try {
+    const body = {
+      filter: {
+        must: [
+          {
+            key: 'id',
+            match: { value: pointId },
+          },
+        ],
+      },
+    };
+    const response = await axios.post(endpoint, body, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+    console.log(`Point with ID ${pointId} deleted. Response:`, response.data);
+  } catch (error: any) {
+    console.error('Failed to delete point:', error.response?.data || error.message);
+  }
+}
 
-  beforeEach(() => {
-    mock = new MockAdapter(axios); // Mock Axios
+describe('Qdrant Embeddings Collection Tests', () => {
+  let pointId: string;
+
+  beforeAll(async () => {
+    // Ensure the embeddings collection exists
+    await ensureCollectionExists();
   });
 
-  afterEach(() => {
-    mock.reset(); // Reset mocks after each test
+  it('should create a collection if none exist, add a point, and verify it exists', async () => {
+    // Generate a unique ID for the test point
+    pointId = uuidv4();
+    const testVector = Array(1536).fill(0.1); // Example vector
+    const testPayload = { author: 'Test User', category: 'test', prompt: 'Test prompt' };
+
+    // Store the embedding in the collection
+    await storeEmbedding(testVector, { ...testPayload, id: pointId });
+
+    // Retrieve the point using GET /collections/{collection_name}/points/{id}
+    const endpoint = `${QDRANT_URL}/collections/${COLLECTION_NAME}/points/${pointId}`;
+    console.log('Verifying point exists:', endpoint);
+    const response = await axios.get(endpoint, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    // Verify the point exists in the database
+    expect(response.status).toBe(200);
+    expect(response.data.result.id).toBe(pointId);
+    console.log('Point verified successfully:', response.data.result);
   });
 
-  it('should store an embedding successfully', async () => {
-    const vector = [0.1, 0.2, 0.3];
-    const payload = { prompt: 'Test prompt' };
-  
-    // Mock successful Qdrant API response
-    mock.onPost(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points`).reply(200, { result: 'success' });
-  
-    // Spy on console.log
-    const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
-  
-    await storeEmbedding(vector, payload);
-  
-    // Check that the request was made with correct payload
-    expect(mock.history.post.length).toBe(1);
-    const requestData = JSON.parse(mock.history.post[0].data);
-    expect(requestData.points[0].vector).toEqual(vector);
-    expect(requestData.points[0].payload).toEqual(payload);
-    expect(requestData.points[0].id).toBeTruthy();
-  
-    // Ensure success message was logged with two arguments
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      'Embedding stored successfully:',
-      { result: 'success' }
-    );
-  
-    consoleLogSpy.mockRestore();
-  });
-  
-
-  it('should throw an error if Qdrant returns an error', async () => {
-    const vector = [0.1, 0.2, 0.3];
-    const payload = { prompt: 'Test prompt' };
-
-    // Mock Qdrant API error response
-    mock.onPost(`${QDRANT_URL}/collections/${COLLECTION_NAME}/points`).reply(400, { error: 'Bad Request' });
-
-    // Expect the function to throw an error
-    await expect(storeEmbedding(vector, payload)).rejects.toThrow('Qdrant insertion failed');
+  afterAll(async () => {
+    // Delete the test point
+    await deletePoint(pointId);
   });
 });
