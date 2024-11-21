@@ -43,6 +43,8 @@ jobs:
           docker system prune -af --volumes
 
       - name: Build and run containers
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           docker-compose -f docker-compose.yml up --build -d
 
