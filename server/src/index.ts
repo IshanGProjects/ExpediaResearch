@@ -2,8 +2,12 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 import process from 'process';
 import OpenAIApi from 'openai';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
+<<<<<<< HEAD
 
 import { TicketmasterAPI } from "./factories/TicketmasterAPI";
 import { TripAdvisorAPI } from "./factories/TripAdvisorAPI";
@@ -15,6 +19,9 @@ const ticketmaster = new TicketmasterAPI(process.env.TICKETMASTER_API_KEY || "")
 const tripadvisor = new TripAdvisorAPI(process.env.TRIPADVISOR_API_KEY || "");
 const weather = new WeatherAPI(process.env.WEATHER_API_KEY || "");
 
+=======
+app.use(express.json());
+>>>>>>> b1f5768 (Fixed error where POST request wasn't working and added dotenv library)
 
 // Enable CORS
 app.use(cors());
@@ -23,8 +30,7 @@ app.use(express.json());
 
 // Initialize OpenAI API with API key
 const openai = new OpenAIApi({
-  // apiKey: process.env.OPENAI_API_KEY, // add a key to .env file from group openai account
-  apiKey: "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"
+  apiKey: process.env.OPENAI_API_KEY, // add a key to .env file from group openai account
 });
 
 // Start the server, ensuring that the port is properly typed
