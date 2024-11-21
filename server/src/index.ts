@@ -2,17 +2,19 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 import process from 'process';
 import OpenAIApi from 'openai';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
-
+app.use(express.json());
 
 // Enable CORS
 app.use(cors());
 
 // Initialize OpenAI API with API key
 const openai = new OpenAIApi({
-  // apiKey: process.env.OPENAI_API_KEY, // add a key to .env file from group openai account
-  apiKey: "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"
+  apiKey: process.env.OPENAI_API_KEY, // add a key to .env file from group openai account
 });
 
 // Start the server, ensuring that the port is properly typed
