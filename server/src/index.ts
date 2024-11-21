@@ -46,6 +46,7 @@ app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<a
   const userPrompt = req.body.userPrompt;
 
   try {
+    // get response from OpenAI based on user prompt
     const response = await openai.chat.completions.create({
       model: "gpt-4o", // Use the appropriate model
       messages: [
@@ -66,6 +67,7 @@ app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<a
     let content = response.choices[0].message.content;
     if (content) {
       try {
+        // Clean up the response   
         content = content.replace(/```json|```/g, "").trim();
         const keywords = JSON.parse(content);
 
@@ -85,7 +87,7 @@ app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<a
         console.log("API Response:", weatherResult);
 
         // Return keywords and API results
-        return res.json({
+        return res.status(200).json({
           keywords,
           ticketmasterResult,
           tripadvisorResult,
@@ -100,7 +102,6 @@ app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<a
       }
     }
 
-    res.json({ keywords });
   } catch (error) {
     console.error("Error in extracting keywords: ", error);
     return res.status(500).json({ error: "Failed to extract keywords" });
