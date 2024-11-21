@@ -40,7 +40,7 @@ export async function ensureCollectionExists(): Promise<void> {
  * @param vector The embedding vector.
  * @param payload Metadata associated with the vector.
  */
-export async function storeEmbedding(vector: number[], payload: Record<string, any>): Promise<void> {
+export async function storeEmbedding(vector: number[], payload: Record<string, any>): Promise<string> {
   const endpoint = `${QDRANT_URL}/collections/${COLLECTION_NAME}/points`;
 
   // Use UUID for unique point ID
@@ -67,6 +67,7 @@ export async function storeEmbedding(vector: number[], payload: Record<string, a
     });
 
     console.log('Embedding stored successfully:', response.data);
+    return id;
   } catch (error: any) {
     console.error('Failed to store embedding:', error.response?.data || error.message);
     throw new Error('Qdrant insertion failed');
