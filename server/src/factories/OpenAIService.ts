@@ -1,5 +1,3 @@
-// OpenAIService.ts
-
 export class OpenAIService {
     private apiKey = 'YOUR_OPENAI_API_KEY'; // Replace with your actual OpenAI API key
   
