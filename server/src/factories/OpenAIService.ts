@@ -1,10 +1,14 @@
 import { Request, Response } from 'express';
 import fetch from 'node-fetch';
+import process from 'process';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // OpenAIService.ts
 
 export class OpenAIService {
-    private apiKey = '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'; // Replace with your actual OpenAI API key
+    private apiKey = process.env.OPENAI_API_KEY; // Replace with your actual OpenAI API key
   
     async analyzePrompt(req: Request, res: Response): Promise<string> {
       // Call to OpenAI API (this is a simplified example)
