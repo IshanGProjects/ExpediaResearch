@@ -4,8 +4,11 @@ import axios from 'axios';
 import process from 'process';
 import { checkQdrantStatus } from './qdrantHandler';
 import { embeddingPromptHandler } from './embedPromptHandler';
+import { OpenAIService } from './factories/OpenAIService'
 
 const app = express();
+
+const openAIService = new OpenAIService();
 
 // Enable CORS
 app.use(cors());
@@ -32,6 +35,11 @@ app.post('/generate-embedding', (req, res) => {
   console.log('Request received');
   embeddingPromptHandler(req, res);
 });
+
+app.post('/promptOpenAI', (req, res) => {
+    console.log('Request received');
+    openAIService.analyzePrompt(req, res);
+})
 
 
 // Qdrant validation endpoint
