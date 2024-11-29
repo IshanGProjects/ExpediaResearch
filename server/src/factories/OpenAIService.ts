@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import fetch from 'node-fetch';
+import axios from 'axios';
 import process from 'process';
 import dotenv from 'dotenv';
 
@@ -8,7 +8,7 @@ dotenv.config();
 // OpenAIService.ts
 
 export class OpenAIService {
-    private apiKey = process.env.OPENAI_API_KEY; // Replace with your actual OpenAI API key
+    private apiKey = process.env.OPENAI_API_KEY;
   
     async analyzePrompt(req: Request, res: Response): Promise<JSON> {
       // Call to OpenAI API (this is a simplified example)
@@ -19,15 +19,9 @@ export class OpenAIService {
         return JSON.parse(`{"error":"error"}`);
       }
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",  // or "gpt-4"
-          messages: [
+      const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+        model: "gpt-3.5-turbo",
+        messages: [
             { role: "user", content: `Given the prompt, "${prompt}" generate a JSON array ranking how applicable each service is for this prompt. Use the format:
 
 [
@@ -49,14 +43,21 @@ export class OpenAIService {
 - Rank each service from 0% (irrelevant) to 100% (highly relevant).
 - In the JSON object dont include the percent symbol in the applicability value.
 - For context: The "Ticketing" service provides tickets to events, "Bookings" helps with travel accommodations, and "Restaurants" suggests nearby dining options.
-Return only the JSON object as a string.`}  // Use the provided prompt
+Return only the JSON object as a string.`,
+            },  
           ],
           max_tokens: 100,
-          temperature: 0.5
-        })
-      });
+          temperature: 0.5,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKey}`
+          },
+        }
+      );
   
-      const data = await response.json();
+      const data = response.data;
 
       return this.filterOpenAIResponse(data.choices[0].message.content);
     }
@@ -76,6 +77,7 @@ Return only the JSON object as a string.`}  // Use the provided prompt
             const applicabilityValue = parseInt(item.applicability, 10);
             return applicabilityValue >= threshold;
         });
+
     
         return filteredServices;
     }
