@@ -36,9 +36,10 @@ app.post('/generate-embedding', (req, res) => {
   embeddingPromptHandler(req, res);
 });
 
-app.post('/promptOpenAI', (req, res) => {
+app.post('/promptOpenAI', async (req, res) => {
     console.log('Request received');
-    openAIService.analyzePrompt(req, res);
+    let result = await openAIService.analyzePrompt(req, res);
+    res.status(200).json({ message: `${JSON.stringify(result)}` });
 })
 
 
