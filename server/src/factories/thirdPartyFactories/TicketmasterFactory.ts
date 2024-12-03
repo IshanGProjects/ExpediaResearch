@@ -183,7 +183,6 @@ class TicketmasterProduct implements AbstractProduct {
     }
   }
 
-
   /**
    * Fetches data from the Ticketmaster API.
    */
