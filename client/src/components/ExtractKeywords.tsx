@@ -1,33 +1,34 @@
 import axios from "axios";
 import { useState } from "react";
 
-interface Keywords {
+interface Response {
   location?: string | string[];
-  time?: string | string[];
-  activities?: string | string[];
+  date?: string | string[];
 }
 
-const ExtractKeywords = () => {
-  const [userPrompt, setUserPrompt] = useState("");
-  const [keywords, setKeywords] = useState<Keywords | null>(null);
+const ExtractWeather = () => {
+  const [location, setLocation] = useState("");
+  const [date, setDate] = useState("");
+  const [response, setResponse] = useState<Response | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // handle click to call OpenAI API to extract keywords
-  const handleExtractKeywords = async () => {
+  const handleExtractWeather = async () => {
     setLoading(true);
     setError("");
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/extract-keywords",
+        "http://localhost:8000/api/extract-weather",
         {
-          userPrompt,
+          location,
+          date,
         }
       );
-      setKeywords(response.data.keywords);
+      setResponse(response.data);
     } catch (error) {
-      setError("Error extracting keywords. Please try again.");
+      setError("Error extracting weather. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -35,25 +36,33 @@ const ExtractKeywords = () => {
 
   return (
     <div>
-      <h1>Travel Keyword Extractor</h1>
+      <h1>Location</h1>
       <textarea
-        value={userPrompt}
-        onChange={(e) => setUserPrompt(e.target.value)}
-        placeholder="Enter your travel-related prompt here..."
+        value={location}
+        onChange={(e) => setLocation(e.target.value)}
+        placeholder="City"
         rows={4}
-        cols={50}
+        cols={10}
+      />
+      <h1>Date</h1>
+      <textarea
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        placeholder="MM-DD-YYYY"
+        rows={4}
+        cols={10}
       />
       <br />
-      <button onClick={handleExtractKeywords} disabled={loading}>
-        {loading ? "Extracting..." : "Extract Keywords"}
+      <button onClick={handleExtractWeather} disabled={loading}>
+        {loading ? "Extracting..." : "Extract Weather"}
       </button>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      {keywords && (
+      {response && (
         <div>
-          <h2>Extracted Keywords:</h2>
+          <h2>Response Data</h2>
           {/* <pre>{JSON.stringify(keywords, null, 2)}</pre> */}
           <ul>
-            {Object.entries(keywords).map(([key, value]) => (
+            {Object.entries(response).map(([key, value]) => (
               <li key={key}>
                 <strong>{key}:</strong>{" "}
                 {Array.isArray(value) ? value.join(", ") : value || "N/A"}
@@ -66,4 +75,4 @@ const ExtractKeywords = () => {
   );
 };
 
-export default ExtractKeywords;
+export default ExtractWeather;
