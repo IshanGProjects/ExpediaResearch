@@ -5,9 +5,21 @@ import OpenAIApi from 'openai';
 
 const app = express();
 
+import { TicketmasterAPI } from "./factories/TicketmasterAPI";
+import { TripAdvisorAPI } from "./factories/TripAdvisorAPI";
+import { WeatherAPI } from "./factories/WeatherAPI";
+
+// Concrete factories
+// TODO move these to more appropriate class
+const ticketmaster = new TicketmasterAPI(process.env.TICKETMASTER_API_KEY || "");
+const tripadvisor = new TripAdvisorAPI(process.env.TRIPADVISOR_API_KEY || "");
+const weather = new WeatherAPI(process.env.WEATHER_API_KEY || "");
+
 
 // Enable CORS
 app.use(cors());
+
+app.use(express.json());
 
 // Initialize OpenAI API with API key
 const openai = new OpenAIApi({
@@ -53,7 +65,30 @@ app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<a
       try {
         content = content.replace(/```json|```/g, "").trim();
         const keywords = JSON.parse(content);
-        return res.json({ keywords });
+
+        // Parse keywords into variables
+        const location = keywords.location || '';
+        const time = keywords.time || '';
+        const activities = keywords.activities || '';
+
+        // API calls to external services
+        // TODO these could be handled outside of this route
+        const ticketmasterResult = ticketmaster.makeAPICall(location, time, activities);
+        const tripadvisorResult = tripadvisor.makeAPICall(location, time, activities);
+        const weatherResult = weather.makeAPICall(location, time, activities);
+        
+        console.log("API Response:", ticketmasterResult);
+        console.log("API Response:", tripadvisorResult);
+        console.log("API Response:", weatherResult);
+
+        // Return keywords and API results
+        return res.json({
+          keywords,
+          ticketmasterResult,
+          tripadvisorResult,
+          weatherResult
+        });
+
       } catch (error) {
         console.log("Error in parsing JSON: ", error);
         return res
@@ -68,6 +103,3 @@ app.post("/api/extract-keywords", async (req: Request, res: Response): Promise<a
     return res.status(500).json({ error: "Failed to extract keywords" });
   }
 });
-
-
-
