@@ -7,7 +7,8 @@
     "skipLibCheck": true,                // Skip type checking of declaration files
     "allowSyntheticDefaultImports": true,// Allow default imports for React
     "strict": true,                      // Enable strict mode for TypeScript
-    "noEmit": true                       // Don't emit JavaScript files (just for type checking)
+    "noEmit": true,                      // Don't emit JavaScript files (just for type checking)
+    "resolveJsonModule": true            // allow importing JSON files
   },
   "include": ["src/**/*", "babel.config.js"],               // Include all TypeScript files
   "exclude": ["node_modules"]            // Exclude node_modules
