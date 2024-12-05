@@ -14,6 +14,14 @@ interface TicketmasterAction {
   params: { [key: string]: any };
 }
 
+  /**
+ * Default API settings to control global size and pagination behavior.
+ */
+  const defaultApiSettings = {
+    size: 20, // Default number of results per page
+    page: 0,  // Default page number
+  };
+
 export class TicketmasterFactory implements AbstractFactory {
   createProduct(): AbstractProduct {
     return new TicketmasterProduct();
@@ -150,38 +158,75 @@ class TicketmasterProduct implements AbstractProduct {
     }
   }
   
-  /**
-   * Construct the Ticketmaster API endpoint based on the action and parameters.
-   */
-  private constructEndpoint(action: string, params: { [key: string]: any }): string {
-    const queryParams = new URLSearchParams();
+  // /**
+  //  * Construct the Ticketmaster API endpoint based on the action and parameters.
+  //  */
+  // private constructEndpoint(action: string, params: { [key: string]: any }): string {
+  //   const queryParams = new URLSearchParams();
 
-    // Add all parameters to the query string dynamically
-    for (const [key, value] of Object.entries(params)) {
-      if (value) {
-        queryParams.append(key, value.toString());
-      }
-    }
+  //   // Add all parameters to the query string dynamically
+  //   for (const [key, value] of Object.entries(params)) {
+  //     if (value) {
+  //       queryParams.append(key, value.toString());
+  //     }
+  //   }
 
-    switch (action) {
-      case 'getAttractions':
-        return `/attractions.json?${queryParams.toString()}`;
-      case 'getAttractionDetails':
-        return `/attractions/${params.id}.json`; // ID is part of the path, not query string
-      case 'getClassifications':
-        return `/classifications.json?${queryParams.toString()}`;
-      case 'getEvents':
-        return `/events.json?${queryParams.toString()}`;
-      case 'getEventDetails':
-        return `/events/${params.id}.json`; // ID is part of the path, not query string
-      case 'getVenues':
-        return `/venues.json?${queryParams.toString()}`;
-      case 'getVenueDetails':
-        return `/venues/${params.id}.json`; // ID is part of the path, not query string
-      default:
-        throw new Error(`Unsupported action: ${action}`);
+  //   switch (action) {
+  //     case 'getAttractions':
+  //       return `/attractions.json?${queryParams.toString()}`;
+  //     case 'getAttractionDetails':
+  //       return `/attractions/${params.id}.json`; // ID is part of the path, not query string
+  //     case 'getClassifications':
+  //       return `/classifications.json?${queryParams.toString()}`;
+  //     case 'getEvents':
+  //       return `/events.json?${queryParams.toString()}`;
+  //     case 'getEventDetails':
+  //       return `/events/${params.id}.json`; // ID is part of the path, not query string
+  //     case 'getVenues':
+  //       return `/venues.json?${queryParams.toString()}`;
+  //     case 'getVenueDetails':
+  //       return `/venues/${params.id}.json`; // ID is part of the path, not query string
+  //     default:
+  //       throw new Error(`Unsupported action: ${action}`);
+  //   }
+  // }
+
+  private constructEndpoint(action: string, params: { [key: string]: any }, usePagination = false): string {
+  const queryParams = new URLSearchParams();
+
+  // Add all parameters to the query string dynamically
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null) {
+      queryParams.append(key, value.toString());
     }
   }
+
+  // Add pagination parameters if toggled on
+  if (usePagination) {
+    queryParams.append('size', defaultApiSettings.size.toString());
+    queryParams.append('page', defaultApiSettings.page.toString());
+  }
+
+  switch (action) {
+    case 'getAttractions':
+      return `/attractions.json?${queryParams.toString()}`;
+    case 'getAttractionDetails':
+      return `/attractions/${params.id}.json`; // ID is part of the path, not query string
+    case 'getClassifications':
+      return `/classifications.json?${queryParams.toString()}`;
+    case 'getEvents':
+      return `/events.json?${queryParams.toString()}`;
+    case 'getEventDetails':
+      return `/events/${params.id}.json`; // ID is part of the path, not query string
+    case 'getVenues':
+      return `/venues.json?${queryParams.toString()}`;
+    case 'getVenueDetails':
+      return `/venues/${params.id}.json`; // ID is part of the path, not query string
+    default:
+      throw new Error(`Unsupported action: ${action}`);
+  }
+}
+
 
   /**
    * Fetches data from the Ticketmaster API.
