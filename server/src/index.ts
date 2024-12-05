@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-<<<<<<< HEAD
 
 import { TicketmasterAPI } from "./factories/TicketmasterAPI";
 import { TripAdvisorAPI } from "./factories/TripAdvisorAPI";
@@ -19,9 +18,7 @@ const ticketmaster = new TicketmasterAPI(process.env.TICKETMASTER_API_KEY || "")
 const tripadvisor = new TripAdvisorAPI(process.env.TRIPADVISOR_API_KEY || "");
 const weather = new WeatherAPI(process.env.WEATHER_API_KEY || "");
 
-=======
 app.use(express.json());
->>>>>>> b1f5768 (Fixed error where POST request wasn't working and added dotenv library)
 
 // Enable CORS
 app.use(cors());
