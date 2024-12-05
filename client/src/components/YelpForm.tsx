@@ -40,6 +40,13 @@ const YelpForm = () => {
     setLoading(true);
 
     try {
+      if (!location && !searchTerm) {
+        setLocationError(true);
+        setSearchTermError(true);
+        setLoading(false);
+        return;
+      }
+
       if (!location) {
         setLocationError(true);
         setLoading(false);
