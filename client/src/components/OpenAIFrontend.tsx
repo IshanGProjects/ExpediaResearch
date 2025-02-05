@@ -38,12 +38,9 @@ const OpenAIFrontend = () => {
     setError("");
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/promptOpenAI",
-        {
-          prompt,
-        }
-      );
+      const response = await axios.post("http://localhost:8000/promptOpenAI", {
+        prompt,
+      });
       const data = response.data;
       setActivities(data.parsedActivities);
     } catch (error) {
@@ -75,11 +72,7 @@ const OpenAIFrontend = () => {
               size="medium"
             />
 
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handleSubmit}
-            >
+            <Button variant="contained" size="large" onClick={handleSubmit}>
               Submit
             </Button>
           </Stack>
@@ -87,32 +80,42 @@ const OpenAIFrontend = () => {
 
         {/* Right Grid Area */}
         <Grid size={8} display="flex" justifyContent="center" paddingRight={3}>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Image</TableCell>
-                  <TableCell align="right">Activity Name</TableCell>
-                  <TableCell align="right">Time</TableCell>
-                  <TableCell align="right">Date</TableCell>
-                  <TableCell align="right">Location</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {activities.map((activity) => (
+          {activities.length > 0 ? (
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Image</TableCell>
+                    <TableCell align="right">Activity Name</TableCell>
+                    <TableCell align="right">Time</TableCell>
+                    <TableCell align="right">Date</TableCell>
+                    <TableCell align="right">Location</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {activities.map((activity) => (
                     <TableRow key={activity.activity_name}>
                       <TableCell component="th" scope="row">
-                        <img src={activity.image} alt={activity.activity_name} style={{ width: "200px" }} />
+                        <img
+                          src={activity.image}
+                          alt={activity.activity_name}
+                          style={{ width: "200px" }}
+                        />
                       </TableCell>
-                      <TableCell align="right">{activity.activity_name}</TableCell>
+                      <TableCell align="right">
+                        {activity.activity_name}
+                      </TableCell>
                       <TableCell align="right">{activity.time}</TableCell>
                       <TableCell align="right">{activity.date}</TableCell>
                       <TableCell align="right">{activity.location}</TableCell>
                     </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ) : (
+            <></>
+          )}
         </Grid>
       </Grid>
     </>
