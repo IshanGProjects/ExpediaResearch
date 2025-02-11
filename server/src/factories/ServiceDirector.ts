@@ -31,7 +31,7 @@ export class ServiceDirector {
         for (const result of analysisResults) {
             const { service, applicability } = result;
 
-            if (applicability < 50) {
+            if (applicability < 90) {
                 console.log(`Skipping service: ${service} (Applicability: ${applicability}%)`);
                 serviceResponses.push({
                     service,
