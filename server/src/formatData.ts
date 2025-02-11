@@ -9,18 +9,21 @@ export async function formatData(service: string, combinedData: { service: strin
     const openAiEndpoint = 'https://api.openai.com/v1/chat/completions';
     const openAiApiKey = process.env.OPENAI_API_KEY;
 
-    try {
-        if (!combinedData || combinedData.length === 0) {
-            console.warn(`No data provided for combined formatting.`);
-            return parsedActivities;
-        }
+    if (!combinedData || combinedData.length === 0) {
+        console.warn(`No data provided for combined formatting.`);
+        return parsedActivities;
+    }
 
-        const requestBody = {
-            model: 'gpt-3.5-turbo',
-            messages: [
-                {
-                    role: 'system',
-                    content: `You are a data extraction assistant that processes raw JSON data from multiple services. Extract activities in a standardized format:
+    const jsonData = JSON.stringify(combinedData, null, 2);
+    // Ensure JSON data is properly formatted by inserting commas where needed and ensuring only valid characters
+    const correctedData = jsonData.replace(/}\s*{/g, '},{').replace(/`/g, '"');
+
+    const requestBody = {
+        model: 'gpt-3.5-turbo',
+        messages: [
+            {
+                role: 'system',
+                content: `You are a data extraction assistant that processes raw JSON data from multiple services. Extract activities in a standardized format:
 - image: URL or image data for the activity.
 - activity_name: Name or title of the activity.
 - time: Time or duration of the activity (if available).
@@ -28,20 +31,17 @@ export async function formatData(service: string, combinedData: { service: strin
 - location: Location of the activity.
 - details: Key highlights or details about the activity.
 - link: url to more information about the activity.`,
-                },
-                {
-                    role: 'user',
-                    content: `Format the following combined raw data into the standardized activity format:\n\n${JSON.stringify(
-                        combinedData,
-                        null,
-                        2
-                    )}`,
-                },
-            ],
-            max_tokens: 1500,
-            temperature: 0.3,
-        };
+            },
+            {
+                role: 'user',
+                content: `Format the following combined raw data into the standardized activity format:\n\n${correctedData}`,
+            },
+        ],
+        max_tokens: 1500,
+        temperature: 0.3,
+    };
 
+    try {
         const response = await axios.post(openAiEndpoint, requestBody, {
             headers: {
                 'Content-Type': 'application/json',
@@ -53,7 +53,6 @@ export async function formatData(service: string, combinedData: { service: strin
 
         console.log(`Raw response from OpenAI:`, llmOutput);
 
-        // Strip surrounding backticks or malformed JSON wrappers
         const cleanOutput = llmOutput.replace(/^```json|```$/g, '').trim();
 
         const formattedData = JSON.parse(cleanOutput);
