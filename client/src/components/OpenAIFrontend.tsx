@@ -72,9 +72,15 @@ const OpenAIFrontend = () => {
               size="medium"
             />
 
-            <Button variant="contained" size="large" onClick={handleSubmit}>
-              Submit
-            </Button>
+            {loading ? (
+              <Button variant="contained" size="large" disabled>
+                Loading
+              </Button>
+            ) : (
+              <Button variant="contained" size="large" onClick={handleSubmit}>
+                Submit
+              </Button>
+            )}
           </Stack>
         </Grid>
 
