@@ -23,6 +23,18 @@ const NavBar = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const handlePages = (page: String) => {
+    console.log("Page: " + page);
+  };
+
+  const handleLogin = () => {
+    console.log("Login");
+  };
+
+  const handleRegister = () => {
+    console.log("Register");
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* AppBar */}
@@ -41,7 +53,12 @@ const NavBar = () => {
           {/* Desktop Buttons (Hidden on Mobile) */}
           <Box sx={{ display: { xs: "none", md: "flex" }, ml: "auto" }}>
             {pages.map((page) => (
-              <Button color="inherit" key={page} sx={{ color: "black" }}>
+              <Button
+                color="inherit"
+                key={page}
+                onClick={() => handlePages(page)}
+                sx={{ color: "black" }}
+              >
                 {page}
               </Button>
             ))}
@@ -50,10 +67,12 @@ const NavBar = () => {
             <Button
               color="inherit"
               variant="outlined"
+              onClick={handleLogin}
               sx={{
                 color: "black",
                 backgroundColor: "#D3D3D3",
                 borderRadius: 2,
+                ml: 1.25,
               }}
             >
               Login
@@ -63,6 +82,7 @@ const NavBar = () => {
             <Button
               color="inherit"
               variant="outlined"
+              onClick={handleRegister}
               sx={{
                 color: "white",
                 backgroundColor: "black",
@@ -89,7 +109,7 @@ const NavBar = () => {
         <List>
           {pages.map((page) => (
             <ListItem key={page} onClick={handleDrawerToggle}>
-              <ListItemText primary={page} />
+              <ListItemText primary={page} onClick={() => handlePages(page)} />
             </ListItem>
           ))}
         </List>
@@ -100,10 +120,10 @@ const NavBar = () => {
         {/* List for Login/Register */}
         <List>
           <ListItem key="Login" onClick={handleDrawerToggle}>
-            <ListItemText primary="Login" />
+            <ListItemText primary="Login" onClick={handleLogin} />
           </ListItem>
           <ListItem key="Register" onClick={handleDrawerToggle}>
-            <ListItemText primary="Register" />
+            <ListItemText primary="Register" onClick={handleRegister} />
           </ListItem>
         </List>
       </Drawer>
