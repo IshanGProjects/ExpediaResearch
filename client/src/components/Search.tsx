@@ -8,13 +8,13 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
-const Search = () => {
-  const [userPrompt, setUserPrompt] = useState("");
-  // Test handle click search icon
-  const handleSearch = () => {
-    console.log("User Input: " + userPrompt);
-  };
+interface SearchProps {
+  userPrompt: string;
+  setUserPrompt: (value: string) => void;
+  handleSearch: () => void;
+};
 
+const Search: React.FC<SearchProps> = ({userPrompt, setUserPrompt, handleSearch}) => {
   return (
     <>
       <Box
