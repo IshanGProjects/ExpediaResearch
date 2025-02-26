@@ -2,21 +2,26 @@ import React from "react";
 import NavBar from "../components/NavBar";
 import Search from "../components/Search";
 import CardGrid from "../components/CardGrid";
-
-// TEMP DATA DELETE LATER
-const testResults = [
-  { title: "Card 1", description: "Card 1 Description" },
-  { title: "Card 2", description: "Card 2 Description" },
-  { title: "Card 3", description: "Card 3 Description" },
-  { title: "Card 4", description: "Card 4 Description" },
-];
+import axios from "axios";
 
 const Home = () => {
   const [userPrompt, setUserPrompt] = React.useState("");
+  const [searchResults, setSearchResults] = React.useState([]);
 
-  // function to handle search
-  const handleSearch = () => {
-    console.log("User Input: " + userPrompt);
+  const handleSubmit = async () => {
+    // setLoading(true);
+    // setError("");
+
+    try {
+      const response = await axios.post("http://localhost:8000/promptOpenAI", {
+        prompt: userPrompt,
+      });
+      const data = response.data;
+      setSearchResults(data.parsedActivities);
+    } catch (error) {
+      console.log("Error in handleSubmit");
+      console.log(error);
+    }
   };
 
   return (
@@ -25,9 +30,9 @@ const Home = () => {
       <Search
         userPrompt={userPrompt}
         setUserPrompt={setUserPrompt}
-        handleSearch={handleSearch}
+        handleSearch={handleSubmit}
       />
-      <CardGrid searchResults={testResults} />
+      <CardGrid searchResults={searchResults} />
     </>
   );
 };
