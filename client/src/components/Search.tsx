@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -12,9 +12,19 @@ interface SearchProps {
   userPrompt: string;
   setUserPrompt: (value: string) => void;
   handleSearch: () => void;
-};
+  loading: boolean;
+  error: boolean;
+  errorMessage: string;
+}
 
-const Search: React.FC<SearchProps> = ({userPrompt, setUserPrompt, handleSearch}) => {
+const Search: React.FC<SearchProps> = ({
+  userPrompt,
+  setUserPrompt,
+  handleSearch,
+  loading,
+  error,
+  errorMessage,
+}) => {
   return (
     <>
       <Box
@@ -35,6 +45,11 @@ const Search: React.FC<SearchProps> = ({userPrompt, setUserPrompt, handleSearch}
           variant="outlined"
           label="Where to next?"
           onChange={(e) => setUserPrompt(e.target.value)}
+          multiline
+          minRows={1}
+          maxRows={4}
+          error={error}
+          helperText={error ? errorMessage : ""}
           sx={{
             mt: 2,
             width: "300px",
@@ -45,7 +60,7 @@ const Search: React.FC<SearchProps> = ({userPrompt, setUserPrompt, handleSearch}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={handleSearch}>
+                <IconButton loading={loading} onClick={handleSearch}>
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>

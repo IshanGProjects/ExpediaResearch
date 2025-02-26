@@ -7,10 +7,20 @@ import axios from "axios";
 const Home = () => {
   const [userPrompt, setUserPrompt] = React.useState("");
   const [searchResults, setSearchResults] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState("");
 
   const handleSubmit = async () => {
-    // setLoading(true);
-    // setError("");
+    setLoading(true);
+    setError(false);
+
+    if (userPrompt === "") {
+      setError(true);
+      setErrorMessage("Please enter a prompt");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post("http://localhost:8000/promptOpenAI", {
@@ -19,8 +29,12 @@ const Home = () => {
       const data = response.data;
       setSearchResults(data.parsedActivities);
     } catch (error) {
-      console.log("Error in handleSubmit");
+      setError(true);
+      setErrorMessage("Error getting activities");
+      console.log("Error in querying data.");
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -31,6 +45,9 @@ const Home = () => {
         userPrompt={userPrompt}
         setUserPrompt={setUserPrompt}
         handleSearch={handleSubmit}
+        loading={loading}
+        error={error}
+        errorMessage={errorMessage}
       />
       <CardGrid searchResults={searchResults} />
     </>
