@@ -2,6 +2,8 @@ import React from "react";
 import NavBar from "../components/NavBar";
 import Search from "../components/Search";
 import CardGrid from "../components/CardGrid";
+import Footer from "../components/Footer";
+import { Box } from "@mui/material";
 import axios from "axios";
 
 const Home = () => {
@@ -40,16 +42,30 @@ const Home = () => {
 
   return (
     <>
-      <NavBar />
-      <Search
-        userPrompt={userPrompt}
-        setUserPrompt={setUserPrompt}
-        handleSearch={handleSubmit}
-        loading={loading}
-        error={error}
-        errorMessage={errorMessage}
-      />
-      <CardGrid searchResults={searchResults} />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh", // Ensures the page takes up full height
+        }}
+      >
+        {/* Main Content */}
+        <Box sx={{ flex: 1 }}>
+          <NavBar />
+          <Search
+            userPrompt={userPrompt}
+            setUserPrompt={setUserPrompt}
+            handleSearch={handleSubmit}
+            loading={loading}
+            error={error}
+            errorMessage={errorMessage}
+          />
+          <CardGrid searchResults={searchResults} />
+        </Box>
+
+        {/* Footer - Stays at the Bottom */}
+        <Footer />
+      </Box>
     </>
   );
 };

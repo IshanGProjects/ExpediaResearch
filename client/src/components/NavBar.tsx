@@ -38,7 +38,7 @@ const NavBar = () => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* AppBar */}
-      <AppBar position="static" sx={{ backgroundColor: "#FFEE58" }}>
+      <AppBar position="static" sx={{ backgroundColor: "#FFEE58", maxWidth: "100%" }}>
         <Toolbar>
           {/* Logo */}
           <img src={logo} style={{ height: 65 }} />

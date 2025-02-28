@@ -32,8 +32,8 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults }) => {
       sx={{
         backgroundColor: "#FFEE58",
         padding: 2,
-        borderRadius: 3,
-        width: "100%",
+        maxWidth: "100%",
+        margin: "0 auto",
       }}
     >
       <Grid container spacing={3} sx={{ mt: 4, px: 4 }}>
@@ -59,7 +59,12 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults }) => {
                 <img
                   src={result.image}
                   alt={result.activity_name}
-                  style={{ width: "100%", height: "150px", objectFit: "cover", marginBottom: "10px" }}
+                  style={{
+                    width: "100%",
+                    height: "150px",
+                    objectFit: "cover",
+                    marginBottom: "10px",
+                  }}
                 />
                 <Typography variant="h6">{result.activity_name}</Typography>
                 <Typography variant="body2">{result.details}</Typography>

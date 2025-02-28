@@ -35,6 +35,8 @@ const Search: React.FC<SearchProps> = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          maxWidth: "100%",
+          margin: "0 auto",
         }}
       >
         <Typography variant="h3">Expedia Travel</Typography>
