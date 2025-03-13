@@ -60,7 +60,7 @@ const Home = () => {
             error={error}
             errorMessage={errorMessage}
           />
-          <CardGrid searchResults={searchResults} />
+          <CardGrid searchResults={searchResults} loading={loading} />
         </Box>
 
         {/* Footer - Stays at the Bottom */}

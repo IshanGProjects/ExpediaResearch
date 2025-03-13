@@ -59,14 +59,16 @@ const Search: React.FC<SearchProps> = ({
               borderRadius: "25px", // Rounded corners
             },
           }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton loading={loading} onClick={handleSearch}>
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton loading={loading} onClick={handleSearch}>
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Box>
