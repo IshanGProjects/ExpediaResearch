@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/ExpediaLogo.svg";
 import {
   AppBar,
@@ -17,6 +18,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 const pages = ["Home", "Discover", "About", "Help"];
 
 const NavBar = () => {
+  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const handleDrawerToggle = () => {
@@ -24,15 +26,15 @@ const NavBar = () => {
   };
 
   const handlePages = (page: String) => {
-    console.log("Page: " + page);
+    navigate("/" + page.toLowerCase());
   };
 
   const handleLogin = () => {
-    console.log("Login");
+    navigate("/login");
   };
 
   const handleRegister = () => {
-    console.log("Register");
+    navigate("/register");
   };
 
   return (

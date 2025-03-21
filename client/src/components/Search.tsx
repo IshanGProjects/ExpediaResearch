@@ -44,6 +44,7 @@ const Search: React.FC<SearchProps> = ({
 
         {/* Search Input Field with Search Icon */}
         <TextField
+          name="searchField"
           variant="outlined"
           label="Where to next?"
           onChange={(e) => setUserPrompt(e.target.value)}

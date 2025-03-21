@@ -90,6 +90,7 @@ const LoginCard = () => {
               Email:
             </Typography>
             <TextField
+              id="email"
               placeholder="email@example.com"
               variant="outlined"
               fullWidth
@@ -111,6 +112,7 @@ const LoginCard = () => {
               Password:
             </Typography>
             <TextField
+              id="password"
               placeholder="Must be at least 6 characters"
               variant="outlined"
               fullWidth
