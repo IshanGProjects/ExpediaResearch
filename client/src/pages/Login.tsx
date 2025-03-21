@@ -2,7 +2,6 @@ import React from "react";
 import NavBar from "../components/NavBar";
 import LoginCard from "../components/LoginCard";
 import Footer from "../components/Footer";
-import Search from "../components/Search";
 import { Box } from "@mui/material/";
 
 const Login = () => {

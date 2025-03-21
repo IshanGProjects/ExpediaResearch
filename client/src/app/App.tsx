@@ -7,8 +7,8 @@ function App() {
   // return <SampleComponent />;
   return (
     <>
-      {/* <Login /> */}
-      <Home />
+      <Login />
+      {/* <Home /> */}
     </>
   );
 }

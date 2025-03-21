@@ -14,7 +14,46 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const LoginCard = () => {
   const [showPassword, setShowPassword] = React.useState(false);
-  // TODO - Implement working buttons to send data (for now just console log)
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [errorEmail, setEmailError] = React.useState(false);
+  const [errorPassword, setErrorPassword] = React.useState(false);
+  const [errorEmailMessage, setErrorEmailMessage] = React.useState("");
+  const [errorPasswordMessage, setErrorPasswordMessage] = React.useState("");
+
+  const handleLogin = () => {
+    let isValid = true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    setEmailError(false);
+    setErrorEmailMessage("");
+    setErrorPassword(false);
+    setErrorPasswordMessage("");
+
+    // email validation
+    if (email === "") {
+      setEmailError(true);
+      setErrorEmailMessage("Please enter an email");
+      isValid = false;
+    } else if (emailRegex.test(email) === false) {
+      setEmailError(true);
+      setErrorEmailMessage("Please enter a valid email");
+      isValid = false;
+    }
+
+    // password validation
+    if (password === "") {
+      setErrorPassword(true);
+      setErrorPasswordMessage("Please enter a password");
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    console.log("Email: ", email);
+    console.log("Password: ", password);
+    console.log("Logging in...");
+  };
 
   return (
     <>
@@ -24,9 +63,9 @@ const LoginCard = () => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
-          height: "100vh",
+          height: "auto",
+          paddingTop: 15,
           position: "relative",
-          top: "-10vh",
         }}
       >
         {/* Login Title */}
@@ -55,8 +94,16 @@ const LoginCard = () => {
               variant="outlined"
               fullWidth
               margin="normal"
-              sx={{ backgroundColor: "white" }}
+              onChange={(e) => setEmail(e.target.value)}
+              error={errorEmail}
+              helperText={errorEmailMessage}
               autoComplete="email"
+              sx={{ backgroundColor: "white" }}
+              slotProps={{
+                formHelperText: {
+                  sx: { backgroundColor: "#FFEE58", margin: 0 },
+                },
+              }}
             />
 
             {/* Password Input */}
@@ -69,8 +116,14 @@ const LoginCard = () => {
               fullWidth
               margin="normal"
               type={showPassword ? "text" : "password"}
+              onChange={(e) => setPassword(e.target.value)}
+              error={errorPassword}
+              helperText={errorPasswordMessage}
               sx={{ backgroundColor: "white" }}
               slotProps={{
+                formHelperText: {
+                  sx: { backgroundColor: "#FFEE58", margin: 0 },
+                },
                 input: {
                   endAdornment: (
                     <InputAdornment position="end">
@@ -89,6 +142,7 @@ const LoginCard = () => {
             <Button
               fullWidth
               variant="contained"
+              onClick={handleLogin}
               sx={{ backgroundColor: "black", mt: 2, py: 1.5, borderRadius: 2 }}
             >
               Login
