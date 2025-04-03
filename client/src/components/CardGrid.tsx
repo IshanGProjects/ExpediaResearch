@@ -1,5 +1,6 @@
 import React from "react";
 import CardSkeleton from "./CardSkeleton";
+import TravelPic from "../assets/TravelPicture.jpg";
 import {
   Grid2 as Grid,
   Card,
@@ -27,7 +28,6 @@ interface CardGridProps {
 const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
   // Show background picture if not loading and no search results
   if (!loading && searchResults.length === 0) {
-    const TravelPic = require("../assets/TravelPicture.jpg");
     return (
       <Box
         sx={{
