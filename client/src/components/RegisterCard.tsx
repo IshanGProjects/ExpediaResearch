@@ -1,38 +1,56 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Box,
+  Typography,
   Card,
   CardContent,
-  Typography,
   TextField,
-  Button,
   InputAdornment,
   IconButton,
+  Button,
   Divider,
-} from "@mui/material";
+} from "@mui/material/";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
-const LoginCard = () => {
+const RegisterCard = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [errorFirstName, setFirstNameError] = React.useState(false);
+  const [errorLastName, setLastNameError] = React.useState(false);
   const [errorEmail, setEmailError] = React.useState(false);
   const [errorPassword, setErrorPassword] = React.useState(false);
   const [errorEmailMessage, setErrorEmailMessage] = React.useState("");
   const [errorPasswordMessage, setErrorPasswordMessage] = React.useState("");
 
-  const handleLogin = () => {
+  // TODO: IMPLEMENT VALIDATION FOR INPUTS AND ERROR HANDLING
+  const handleSignUp = () => {
     let isValid = true;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    // reset error states
+    setFirstNameError(false);
+    setLastNameError(false);
     setEmailError(false);
-    setErrorEmailMessage("");
     setErrorPassword(false);
+    setErrorEmailMessage("");
     setErrorPasswordMessage("");
 
-    // email validation
+    // check if names are valid
+    if (firstName === "") {
+      setFirstNameError(true);
+      isValid = false;
+    }
+    if (lastName === "") {
+      setLastNameError(true);
+      isValid = false;
+    }
+
+    // check if email is valid
     if (email === "") {
       setEmailError(true);
       setErrorEmailMessage("Please enter an email");
@@ -43,18 +61,24 @@ const LoginCard = () => {
       isValid = false;
     }
 
-    // password validation
+    // check if password is valid
     if (password === "") {
       setErrorPassword(true);
       setErrorPasswordMessage("Please enter a password");
+      isValid = false;
+    } else if (password.length < 8) {
+      setErrorPassword(true);
+      setErrorPasswordMessage("Password must be at least 8 characters");
       isValid = false;
     }
 
     if (!isValid) return;
 
+    console.log("First Name: ", firstName);
+    console.log("Last Name: ", lastName);
     console.log("Email: ", email);
     console.log("Password: ", password);
-    console.log("Logging in...");
+    console.log("Signing up...");
   };
 
   return (
@@ -66,41 +90,82 @@ const LoginCard = () => {
           justifyContent: "center",
           alignItems: "center",
           height: "auto",
-          paddingTop: 15,
+          paddingTop: 12,
           position: "relative",
         }}
       >
-        {/* Login Title */}
-        <Typography variant="h4">Welcome Back!</Typography>
+        {/* Register Title */}
+        <Typography variant="h4">Your Journey Begins Here</Typography>
         <Typography variant="subtitle1" fontStyle="italic">
-          Log in to access your account and continue your journey.
+          Create an account to start exploring.
         </Typography>
 
-        {/* Login Card */}
+        {/* Register Card */}
         <Card
           sx={{
             mx: "auto",
             mt: 5,
+            mb: 5,
             p: 3,
             backgroundColor: "#FFEE58",
             boxShadow: 3,
           }}
         >
           <CardContent>
+            {/* Name Input */}
+            <Typography variant="body1" fontWeight={600}>
+              First Name:
+            </Typography>
+            <TextField
+              id="firstName"
+              placeholder="ex: John"
+              variant="outlined"
+              fullWidth
+              error={errorFirstName}
+              helperText={errorFirstName ? "Please enter a first name" : ""}
+              margin="normal"
+              onChange={(e) => setFirstName(e.target.value)}
+              sx={{ backgroundColor: "white" }}
+              slotProps={{
+                formHelperText: {
+                  sx: { backgroundColor: "#FFEE58", margin: 0 },
+                },
+              }}
+            />
+
+            <Typography variant="body1" fontWeight={600} mt={2}>
+              Last Name:
+            </Typography>
+            <TextField
+              id="lastName"
+              placeholder="ex: Doe"
+              variant="outlined"
+              fullWidth
+              error={errorLastName}
+              helperText={errorLastName ? "Please enter a last name" : ""}
+              margin="normal"
+              onChange={(e) => setLastName(e.target.value)}
+              sx={{ backgroundColor: "white" }}
+              slotProps={{
+                formHelperText: {
+                  sx: { backgroundColor: "#FFEE58", margin: 0 },
+                },
+              }}
+            />
+
             {/* Email Input */}
             <Typography variant="body1" fontWeight={600}>
               Email:
             </Typography>
             <TextField
-              id="email"
+              id="firstName"
               placeholder="email@example.com"
               variant="outlined"
               fullWidth
-              margin="normal"
-              onChange={(e) => setEmail(e.target.value)}
               error={errorEmail}
               helperText={errorEmailMessage}
-              autoComplete="email"
+              margin="normal"
+              onChange={(e) => setEmail(e.target.value)}
               sx={{ backgroundColor: "white" }}
               slotProps={{
                 formHelperText: {
@@ -115,14 +180,14 @@ const LoginCard = () => {
             </Typography>
             <TextField
               id="password"
-              placeholder="Enter your password"
+              placeholder="Must be at least 8 characters"
               variant="outlined"
               fullWidth
-              margin="normal"
-              type={showPassword ? "text" : "password"}
-              onChange={(e) => setPassword(e.target.value)}
               error={errorPassword}
               helperText={errorPasswordMessage}
+              margin="normal"
+              onChange={(e) => setPassword(e.target.value)}
+              type={showPassword ? "text" : "password"}
               sx={{ backgroundColor: "white" }}
               slotProps={{
                 formHelperText: {
@@ -142,24 +207,24 @@ const LoginCard = () => {
               }}
             />
 
-            {/* Login Button */}
+            {/* Sign Up Button */}
             <Button
+              onClick={handleSignUp}
               fullWidth
               variant="contained"
-              onClick={handleLogin}
               sx={{ backgroundColor: "black", mt: 2, py: 1.5, borderRadius: 2 }}
             >
-              Login
+              Sign Up
             </Button>
 
             {/* Divider */}
             <Divider sx={{ mt: 2 }}>or</Divider>
 
-            {/* Register Button */}
+            {/* Login Button */}
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => navigate('/register')}
+              onClick={() => navigate("/login")}
               sx={{
                 mt: 2,
                 py: 1.5,
@@ -169,7 +234,7 @@ const LoginCard = () => {
                 borderRadius: 2,
               }}
             >
-              Create an Account
+              Already have an account? Log in
             </Button>
           </CardContent>
         </Card>
@@ -178,4 +243,4 @@ const LoginCard = () => {
   );
 };
 
-export default LoginCard;
+export default RegisterCard;

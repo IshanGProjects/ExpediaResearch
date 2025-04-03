@@ -25,17 +25,25 @@ interface CardGridProps {
 }
 
 const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
-  // If there are no cards, we don't want the background to come up
+  // Show background picture if not loading and no search results
   if (!loading && searchResults.length === 0) {
-    return null;
+    const TravelPic = require("../assets/TravelPicture.jpg");
+    return (
+      <Box
+        sx={{
+          backgroundImage: `url(${TravelPic})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          width: "100%",
+          height: "52.5vh", 
+        }}
+      />
+    );
   }
-
-  // TODO: ADD SKELETON GRID WHEN LOADING
 
   return (
     <Box
       sx={{
-        backgroundColor: "#FFEE58",
         padding: 2,
         maxWidth: "100%",
         margin: "0 auto",
