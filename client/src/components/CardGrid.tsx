@@ -1,5 +1,6 @@
 import React from "react";
 import CardSkeleton from "./CardSkeleton";
+import CardModal from "./CardModal";
 import TravelPic from "../assets/TravelPicture.jpg";
 import {
   Grid2 as Grid,
@@ -8,6 +9,7 @@ import {
   CardMedia,
   Typography,
   Box,
+  CardActionArea,
 } from "@mui/material";
 
 type SearchResult = {
@@ -26,6 +28,17 @@ interface CardGridProps {
 }
 
 const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
+  const [selectedCard, setSelectedCard] = React.useState(0);
+  const [openModal, setOpenModal] = React.useState(false);
+  const [selectedCardData, setSelectedCardData] =
+    React.useState<SearchResult | null>(null);
+
+  const handleOpenModal = (index: number, card: SearchResult) => {
+    setSelectedCard(index);
+    setSelectedCardData(card);
+    setOpenModal(true);
+  };
+
   // Show background picture if not loading and no search results
   if (!loading && searchResults.length === 0) {
     return (
@@ -35,7 +48,7 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           width: "100%",
-          height: "52.5vh", 
+          height: "52.5vh",
         }}
       />
     );
@@ -77,70 +90,70 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                     mb: 2,
                   }}
                 >
-                  {/* Image with Overlay Text */}
-                  <Box sx={{ position: "relative" }}>
-                    <CardMedia
-                      component="img"
-                      height={170}
-                      image={result.image}
-                      alt={result.activity_name}
-                      sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
-                    />
-
-                    {/* Overlay */}
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        width: "100%",
-                        background:
-                          "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
-                        color: "white",
-                        padding: "4px",
-                      }}
-                    >
-                      <Typography
-                        variant="h6"
-                        fontWeight="bold"
-                        sx={{
-                          fontSize: "0.9rm",
-                          lineHeight: 1.2,
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: 2,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {result.activity_name}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Card Content */}
-                  <CardContent
+                  <CardActionArea
+                    onClick={() => handleOpenModal(index, result)}
+                    data-active={selectedCard === index ? "" : undefined}
                     sx={{
-                      flexGrow: 1,
-                      display: "flex",
-                      flexDirection: "column",
+                      height: "100%",
+                      "&[data-active]": {
+                        backgroundColor: "action.selected",
+                        "&:hover": {
+                          backgroundColor: "action.selectedHover",
+                        },
+                      },
                     }}
                   >
-                    <Typography variant="subtitle1" color="textSecondary">
-                      {result.location} | {result.date} | {result.time}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="textSecondary"
-                      sx={{ minHeight: 50 }}
-                    >
-                      {result.details}
-                    </Typography>
-                  </CardContent>
+                    {/* Image with Overlay Text */}
+                    <Box sx={{ position: "relative" }}>
+                      <CardMedia
+                        component="img"
+                        height={250}
+                        image={result.image}
+                        alt={result.activity_name}
+                        sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
+                      />
+
+                      {/* Overlay */}
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          width: "100%",
+                          background:
+                            "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
+                          color: "white",
+                          padding: "4px",
+                        }}
+                      >
+                        <Typography
+                          variant="h6"
+                          fontWeight="bold"
+                          sx={{
+                            fontSize: "0.9rm",
+                            lineHeight: 1.2,
+                            display: "-webkit-box",
+                            WebkitBoxOrient: "vertical",
+                            WebkitLineClamp: 2,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {result.activity_name}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </CardActionArea>
                 </Card>
               </Grid>
             ))}
       </Grid>
+      {/* Modal */}
+      <CardModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        searchResult={selectedCardData}
+      />
     </Box>
   );
 };
