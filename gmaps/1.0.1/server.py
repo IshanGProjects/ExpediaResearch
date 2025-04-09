@@ -75,7 +75,20 @@ def scrape_google_maps(location, search_term):
         # Find the 'div' elements with class "W4Efsd" and extract their aria-label attributes
         div_content = [div.get_text(strip=True) for div in soup.find_all('div', class_='W4Efsd')]
         div_content = "\n".join(div_content)
-        # Ensure the 'data' directory exists
+        
+        # Add an endline character before lines that start with a number, except for the first number in the data
+        lines = div_content.split("\n")
+        modified_lines = [aria_labels[0]+"\n"+lines[0]]  # Include first line
+        i_temp =1
+        for line in lines[1:]:
+            if line and line[0].isdigit():
+                modified_lines.append(aria_labels[i_temp]+"\n"+line)
+                i_temp+=1
+            else:
+                modified_lines.append(line)
+        div_content = "\n".join(modified_lines)
+        
+        # Ensure the 'data' directory exists before writing files
         os.makedirs('data', exist_ok=True)
 
         if a_content:
@@ -95,13 +108,17 @@ def scrape_google_maps(location, search_term):
     except Exception as e:
         print(f"An error occurred: {e}")
 
-# Main
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python script.py <location> <search_term>")
-        sys.exit(1)
-    
-    location = sys.argv[1]
-    search_term = sys.argv[2]
-    
-    scrape_google_maps(location, search_term)
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+# POST
+@app.route('/api/gmaps', methods=['POST'])
+def echo():
+    data = request.get_json()
+    scrape_google_maps(data['location'], data['search'])
+    return jsonify({"message": "Data received", "data": data}), 200
+
+# Run the app
+if __name__ == '__main__':
+    app.run(debug=True)
