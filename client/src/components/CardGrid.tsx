@@ -2,10 +2,21 @@ import React from "react";
 import CardSkeleton from "./CardSkeleton";
 import CardModal from "./CardModal";
 import TravelPic from "../assets/TravelPicture.jpg";
+import DefaultRestaurantPic from "../assets/default_restaurant_1.jpeg";
+import DefaultRestaurantPic2 from "../assets/default_restaurant_2.jpeg";
+import DefaultRestaurantPic3 from "../assets/default_restaurant_3.jpg";
+import DefaultRestaurantPic4 from "../assets/default_restaurant_4.jpeg";
+import DefaultRestaurantPic5 from "../assets/default_restaurant_5.jpeg";
+import DefaultRestaurantPic6 from "../assets/default_restaurant_6.jpg";
+import DefaultRestaurantPic7 from "../assets/default_restaurant_7.jpg";
+import DefaultRestaurantPic8 from "../assets/default_restaurant_8.jpg";
+import DefaultRestaurantPic9 from "../assets/default_restaurant_9.jpg";
+import DefaultRestaurantPic10 from "../assets/default_restaurant_10.jpg";
+import DefaultRestaurantPic11 from "../assets/default_restaurant_11.jpeg";
+import DefaultRestaurantPic12 from "../assets/default_restaurant_12.jpeg";
 import {
   Grid2 as Grid,
   Card,
-  CardContent,
   CardMedia,
   Typography,
   Box,
@@ -27,6 +38,22 @@ interface CardGridProps {
   searchResults: SearchResult[];
   loading: boolean;
 }
+
+const DefaultRestaurantImages = [
+  DefaultRestaurantPic,
+  DefaultRestaurantPic2,
+  DefaultRestaurantPic3,
+  DefaultRestaurantPic4,
+  DefaultRestaurantPic5,
+  DefaultRestaurantPic6,
+  DefaultRestaurantPic7,
+  DefaultRestaurantPic8,
+  DefaultRestaurantPic9,
+  DefaultRestaurantPic10,
+  DefaultRestaurantPic11,
+  DefaultRestaurantPic12,
+];
+
 
 const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
   const [selectedCard, setSelectedCard] = React.useState(0);
@@ -104,8 +131,16 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                       },
                     }}
                   >
-                    {/* Image with Overlay Text */}
-                    <Box sx={{ position: "relative" }}>
+                    {result.service === "Restaurants" ? (
+                      
+                      <CardMedia
+                        component="img"
+                        height={250}
+                        image={result.image || DefaultRestaurantImages[Math.floor(Math.random() * DefaultRestaurantImages.length)]}
+                        alt={result.activity_name || "Default Restaurant Picture"}
+                        sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
+                      />
+                    ) : result.service === "Ticketing" ? (
                       <CardMedia
                         component="img"
                         height={250}
@@ -113,6 +148,17 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                         alt={result.activity_name}
                         sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
                       />
+                    ) : result.service === "Accommodations" ? (
+                      <CardMedia
+                        component="img"
+                        height={250}
+                        image={result.image}
+                        alt={result.activity_name}
+                        sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
+                      />
+                    ): null}
+                    
+                    
 
                       {/* Overlay */}
                       <Box
@@ -143,7 +189,7 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                           {result.activity_name}
                         </Typography>
                       </Box>
-                    </Box>
+                    
                   </CardActionArea>
                 </Card>
               </Grid>
