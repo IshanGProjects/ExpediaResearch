@@ -14,6 +14,18 @@ import DefaultRestaurantPic9 from "../assets/default_restaurant_9.jpg";
 import DefaultRestaurantPic10 from "../assets/default_restaurant_10.jpg";
 import DefaultRestaurantPic11 from "../assets/default_restaurant_11.jpeg";
 import DefaultRestaurantPic12 from "../assets/default_restaurant_12.jpeg";
+import DefaultHotelPic1 from "../assets/hotel_1.jpeg";
+import DefaultHotelPic2 from "../assets/hotel_2.jpeg";
+import DefaultHotelPic3 from "../assets/hotel_3.jpeg";
+import DefaultHotelPic4 from "../assets/hotel_4.jpg";
+import DefaultHotelPic5 from "../assets/hotel_5.jpeg";
+import DefaultHotelPic6 from "../assets/hotel_6.jpeg";
+import DefaultHotelPic7 from "../assets/hotel_7.jpeg";
+import DefaultHotelPic8 from "../assets/hotel_8.jpeg";
+import DefaultHotelPic9 from "../assets/hotel_9.jpeg";
+import DefaultHotelPic10 from "../assets/hotel_10.jpg";
+import DefaultHotelPic11 from "../assets/hotel_11.jpg";
+import DefaultHotelPic12 from "../assets/hotel_12.jpeg";
 import {
   Grid2 as Grid,
   Card,
@@ -52,6 +64,21 @@ const DefaultRestaurantImages = [
   DefaultRestaurantPic10,
   DefaultRestaurantPic11,
   DefaultRestaurantPic12,
+];
+
+const DefaultHotelImages = [
+  DefaultHotelPic1,
+  DefaultHotelPic2,
+  DefaultHotelPic3,
+  DefaultHotelPic4,
+  DefaultHotelPic5,
+  DefaultHotelPic6,
+  DefaultHotelPic7,
+  DefaultHotelPic8,
+  DefaultHotelPic9,
+  DefaultHotelPic10,
+  DefaultHotelPic11,
+  DefaultHotelPic12,
 ];
 
 
@@ -152,7 +179,7 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                       <CardMedia
                         component="img"
                         height={250}
-                        image={result.image}
+                        image={result.image || DefaultHotelImages[Math.floor(Math.random() * DefaultHotelImages.length)]}
                         alt={result.activity_name}
                         sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
                       />
