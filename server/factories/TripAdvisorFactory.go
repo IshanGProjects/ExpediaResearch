@@ -166,7 +166,7 @@ func AnalyzeTripAdvisorPromptWithLLM(prompt string) (*TripadvisorAction, error) 
 		"messages": []map[string]string{
 			{"role": "system", "content": "You are a system that derives API actions and query parameters based on user prompts. Please return only a JSON object with the action and parameters."},
 			{"role": "system", "content": "Query parameters with dates must be in the valid format YYYY-MM-DDTHH:mm:ssZ (example: 2020-08-01T14:00:00Z)."},
-			{"role": "user", "content": "Remove any part of the query that is related to Tickets or accommodations."},
+			{"role": "user", "content": "Remove any part of the query that is related to Tickets, Accommodations, Trending Events"},
 			{"role": "user", "content": fmt.Sprintf(`Given the user's request: '%s', determine the most appropriate Tripadvisor API action and parameters. Return a JSON object with the action and parameters. 
 Consider valid actions such as:
 - searchQuery (string): Search for locations based on a query string.

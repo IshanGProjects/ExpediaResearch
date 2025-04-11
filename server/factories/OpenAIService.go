@@ -43,7 +43,7 @@ func (o *OpenAIService) AnalyzePrompt(prompt string) ([]AnalysisResult, error) {
 		"messages": []map[string]string{
 			{
 				"role":    "user",
-				"content": fmt.Sprintf(`Given the prompt, "%s" generate a JSON array ranking how applicable each service is for this prompt. Use the format: [ { "service": "Ticketing", "applicability": "XX" }, { "service": "Accommodations", "applicability": "XX" }, { "service": "Restaurants", "applicability": "XX" } ] - "Applicability" reflects the relevance of each service for fulfilling the user's goal. - Rank each service from 0%% (irrelevant) to 100%% (highly relevant). - In the JSON object, don't include the percent symbol in the applicability value. - For context: The "Ticketing" service provides tickets to events, "Accommodations" helps with travel accommodations, and "Restaurants" suggests nearby dining options. Return only the JSON object as a string`, prompt),
+				"content": fmt.Sprintf(`Given the prompt, "%s" generate a JSON array ranking how applicable each service is for this prompt. Use the format: [ { "service": "Ticketing", "applicability": "XX" }, { "service": "Accommodations", "applicability": "XX" }, { "service": "Restaurants", "applicability": "XX" }, { "service": "TrendingEvents", "applicability": "XX" } ] - "Applicability" reflects the relevance of each service for fulfilling the user's goal. - Rank each service from 0%% (irrelevant) to 100%% (highly relevant). - In the JSON object, don't include the percent symbol in the applicability value. - For context: The "Ticketing" service provides tickets to events, "Accommodations" helps with travel accommodations, and "Restaurants" suggests nearby dining options. Return only the JSON object as a string`, prompt),
 			},
 		},
 		"max_tokens":  100,

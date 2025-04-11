@@ -25,6 +25,7 @@ func NewServiceDirector() *ServiceDirector {
 	sd.Factories["Ticketing"] = &TicketmasterFactory{}
 	sd.Factories["Accommodations"] = &TripAdvisorFactory{}
 	sd.Factories["Restaurants"] = &TripAdvisorFactory{}
+	sd.Factories["TrendingEvents"] = &TwitterFactory{}
 	return sd
 }
 
