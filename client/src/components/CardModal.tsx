@@ -2,6 +2,7 @@ import React from "react";
 import { Modal, Typography, Button, Box, Divider, Stack } from "@mui/material";
 
 type SearchResult = {
+  service: string;
   image: string;
   activity_name: string;
   time: string;
@@ -23,6 +24,9 @@ const CardModal: React.FC<CardModalProps> = ({
   searchResult,
 }) => {
   if (!searchResult) return null;
+  const handleSaveEvent = () => {
+    console.log(searchResult);
+  };
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -69,7 +73,9 @@ const CardModal: React.FC<CardModalProps> = ({
             {searchResult.date} at {searchResult.time}
           </Typography>
         </Stack>
-        <Button variant="contained" sx={{ mt: 2 }}>Save Event</Button>
+        <Button variant="contained" onClick={handleSaveEvent} sx={{ mt: 2 }}>
+          Save Event
+        </Button>
       </Box>
     </Modal>
   );

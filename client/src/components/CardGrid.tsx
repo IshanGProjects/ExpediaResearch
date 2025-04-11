@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 
 type SearchResult = {
+  service: string;
   image: string;
   activity_name: string;
   time: string;

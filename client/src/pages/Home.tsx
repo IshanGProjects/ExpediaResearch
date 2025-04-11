@@ -41,20 +41,18 @@ const Home = () => {
 
       const data = response.data;
 
-      // flatten and extract valid activity data
       const flattenedResults = data
         .filter((service: any) => Array.isArray(service.data))
-        .flatMap((service: any) => service.data)
-        .map((activity: any) => {
-          // format flexible fields like location
-          return {
+        .flatMap((service: any) =>
+          service.data.map((activity: any) => ({
             ...activity,
+            service: service.service, // 🔥 inject service name into each item
             location: formatField(activity.location),
             date: formatField(activity.date),
             time: formatField(activity.time),
             details: formatField(activity.details),
-          };
-        });
+          }))
+        );
 
       setSearchResults(flattenedResults);
     } catch (error) {
