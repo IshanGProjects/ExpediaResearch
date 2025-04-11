@@ -16,20 +16,27 @@ const Home = () => {
   const handleSubmit = async () => {
     setLoading(true);
     setError(false);
-
+  
     if (userPrompt === "") {
       setError(true);
       setErrorMessage("Please enter a prompt");
       setLoading(false);
       return;
     }
-
+  
     try {
       const response = await axios.post("http://localhost:8000/promptOpenAI", {
         prompt: userPrompt,
       });
+  
       const data = response.data;
-      setSearchResults(data.parsedActivities);
+  
+      // flatten and only extract valid activity data
+      const flattenedResults = data
+        .filter((service: any) => Array.isArray(service.data))
+        .flatMap((service: any) => service.data);
+  
+      setSearchResults(flattenedResults);
     } catch (error) {
       setError(true);
       setErrorMessage("Error getting activities");
