@@ -52,26 +52,39 @@ const CardModal: React.FC<CardModalProps> = ({
 
         {/* Details */}
         <Stack spacing={1}>
-          <Typography variant="body1" fontWeight={500}>
-            Details:
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {searchResult.details}
-          </Typography>
+          {searchResult.details !== "" && (
+            <>
+              <Typography variant="body1" fontWeight={500}>
+                Details:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {searchResult.details}
+              </Typography>
+            </>
+          )}
 
-          <Typography variant="body1" fontWeight={500} mt={2}>
-            Location:
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {searchResult.location}
-          </Typography>
+          {searchResult.location !== "" && (
+            <>
+              <Typography variant="body1" fontWeight={500} mt={2}>
+                Location:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {searchResult.location}
+              </Typography>
+            </>
+          )}
 
-          <Typography variant="body1" fontWeight={500} mt={2}>
-            Date & Time:
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {searchResult.date} at {searchResult.time}
-          </Typography>
+          {(searchResult.date?.trim() || searchResult.time?.trim()) && (
+            <>
+              <Typography variant="body1" fontWeight={500} mt={2}>
+                Date & Time:
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {searchResult.date ? searchResult.date : ""}
+                {searchResult.time ? ` at ${searchResult.time}` : ""}
+              </Typography>
+            </>
+          )}
         </Stack>
         <Button variant="contained" onClick={handleSaveEvent} sx={{ mt: 2 }}>
           Save Event
