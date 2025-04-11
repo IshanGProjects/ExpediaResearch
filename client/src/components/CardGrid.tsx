@@ -129,7 +129,7 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                 <CardSkeleton />
               </Grid>
             ))
-          : searchResults.map((result, index) => (
+          : searchResults.slice(0, 12).map((result, index) => (
               <Grid
                 size={{ xs: 12, sm: 6, md: 4 }}
                 sx={{ display: "flex", justifyContent: "center" }}
