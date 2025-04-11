@@ -13,29 +13,49 @@ const Home = () => {
   const [error, setError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
+  function formatField(value: any): string {
+    if (typeof value === "string") return value;
+
+    if (typeof value === "object" && value !== null) {
+      return Object.values(value).filter(Boolean).join(", ");
+    }
+
+    return "";
+  }
+
   const handleSubmit = async () => {
     setLoading(true);
     setError(false);
-  
+
     if (userPrompt === "") {
       setError(true);
       setErrorMessage("Please enter a prompt");
       setLoading(false);
       return;
     }
-  
+
     try {
       const response = await axios.post("http://localhost:8000/promptOpenAI", {
         prompt: userPrompt,
       });
-  
+
       const data = response.data;
-  
-      // flatten and only extract valid activity data
+
+      // flatten and extract valid activity data
       const flattenedResults = data
         .filter((service: any) => Array.isArray(service.data))
-        .flatMap((service: any) => service.data);
-  
+        .flatMap((service: any) => service.data)
+        .map((activity: any) => {
+          // format flexible fields like location
+          return {
+            ...activity,
+            location: formatField(activity.location),
+            date: formatField(activity.date),
+            time: formatField(activity.time),
+            details: formatField(activity.details),
+          };
+        });
+
       setSearchResults(flattenedResults);
     } catch (error) {
       setError(true);
