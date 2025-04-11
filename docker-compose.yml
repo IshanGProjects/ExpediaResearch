@@ -6,17 +6,14 @@ x-common-variables: &common-variables
 services:
   server:
     build: ./server
-    environment:
-      <<: *common-variables
-      NODE_ENV: development
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-    expose:
-      - 8000
     ports:
-      - 8000:8000
+      - "8000:8000"
     volumes:
-      - ./server:/app
-    command: npm run dev
+      - ./server:/usr/src/app
+
+    environment:
+      - EXPRESS_PORT=8000
+    command: go run cmd/main.go -b 0.0.0.0
     depends_on:
       - vectordb
 
