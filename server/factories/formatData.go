@@ -47,6 +47,10 @@ func FormatData(service string, combinedData []CombinedData) ([]interface{}, err
 				"content": "You are a data extraction assistant that processes raw JSON data from multiple services. Extract activities into a standardized format...",
 			},
 			{
+				"role":    "user",
+				"content": "If you receive a list of tweets: Your task is to identify tweets that describe upcoming events relevant to travelers (e.g. concerts, festivals, local gatherings, exhibitions, etc.). Ignore tweets that do not mention a specific future event.",
+			},
+			{
 				"role": "user",
 				"content": fmt.Sprintf("Format the following combined raw data into the standardized activity format, where these fields make up a json file:\n\n%s.\n"+
 					"Extract activities in a standardized format:\n"+

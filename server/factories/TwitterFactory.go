@@ -108,12 +108,6 @@ func (p *TwitterProduct) performHTTPRequest(query string) (map[string]interface{
 	}
 	traverse(doc)
 
-	// print extracted tweets to console log for debug purposes
-	fmt.Printf("Identified tweets:")
-	for i, div := range targetDivs {
-		fmt.Printf("Div #%d: %s\n", i+1, div)
-	}
-
 	// Convert the targetDivs slice to a JSON array
 	jsonData, err := json.Marshal(targetDivs)
 	if err != nil {
@@ -126,17 +120,25 @@ func (p *TwitterProduct) performHTTPRequest(query string) (map[string]interface{
 		panic(err)
 	}
 
-	// Wrap the result array in a map
-	if len(result) > 0 {
-		// Create a map with the array as a field
-		resultMap := map[string]interface{}{
-			"tweets": result, // tweets is the key, and the array is the value
+	// Wrap each tweet in a map with keys like tweet1, tweet2, ...
+	if len(targetDivs) > 0 {
+		resultMap := make(map[string]interface{})
+
+		for i, tweet := range targetDivs {
+			key := fmt.Sprintf("tweet%d", i+1)
+			resultMap[key] = tweet
 		}
 
-		// Return the map containing the array of tweets
+		// Pretty-print the map for debug
+		prettyJSON, err := json.MarshalIndent(resultMap, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(prettyJSON))
+
 		return resultMap, nil
 	} else {
-		return nil, errors.New("JSON array is empty")
+		return nil, errors.New("no tweets found in HTML response")
 	}
 }
 
