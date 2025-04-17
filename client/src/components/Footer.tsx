@@ -15,7 +15,7 @@ const Footer = () => {
       }}
     >
       <Typography variant="body2">
-        &copy; {new Date().getFullYear()} Expedia Travel. All rights reserved.
+        &copy; {new Date().getFullYear()} Travel | Created as a CU Boulder Capstone Project
       </Typography>
     </Box>
   )

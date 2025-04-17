@@ -43,7 +43,7 @@ const NavBar = () => {
       <AppBar position="static" sx={{ backgroundColor: "#FFEE58", maxWidth: "100%" }}>
         <Toolbar>
           {/* Logo */}
-          <img src={logo} style={{ height: 65 }} />
+          {/* <img src={logo} style={{ height: 65 }} /> */}
 
           {/* Mobile Menu Button (Hidden on Desktop) */}
           <Box sx={{ display: { xs: "flex", md: "none" }, ml: "auto" }}>

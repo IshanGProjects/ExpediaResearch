@@ -39,7 +39,7 @@ const Search: React.FC<SearchProps> = ({
           margin: "0 auto",
         }}
       >
-        <Typography variant="h3">Expedia Travel</Typography>
+        <Typography variant="h3">Travel</Typography>
         <Typography variant="h6">Find your next adventure</Typography>
 
         {/* Search Input Field with Search Icon */}

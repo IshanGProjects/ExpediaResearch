@@ -103,7 +103,7 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           width: "100%",
-          height: "52.5vh",
+          height: "56.9vh",
         }}
       />
     );
