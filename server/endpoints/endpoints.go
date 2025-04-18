@@ -31,11 +31,11 @@ func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 	if loginData.Email == "" || loginData.Password == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{"error": "Email and password are required"})
+		json.NewEncoder(w).Encode(map[string]string{"error": "Email and Password are required"})
 		return
 	}
 
-	customToken, err := c.authService.Login(loginData.Email, loginData.Password)
+	customToken, username, err := c.authService.Login(loginData.Email, loginData.Password)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
@@ -43,13 +43,17 @@ func (c *AuthController) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": customToken})
+	json.NewEncoder(w).Encode(map[string]string{
+		"token":    customToken,
+		"username": username,
+	})
 }
 
 func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var registrationData struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
+		Username string `json:"username"`
 	}
 
 	// Parse the JSON body
@@ -59,13 +63,13 @@ func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Basic validation
-	if registrationData.Email == "" || registrationData.Password == "" {
-		http.Error(w, `{"error": "Email and password are required"}`, http.StatusBadRequest)
+	if registrationData.Email == "" || registrationData.Password == "" || registrationData.Username == "" {
+		http.Error(w, `{"error": "Email, Password, and Username are required"}`, http.StatusBadRequest)
 		return
 	}
 
 	// You need access to your authService here — assume it's available in the outer scope
-	customToken, err := c.authService.Register(registrationData.Email, registrationData.Password)
+	customToken, username, err := c.authService.Register(registrationData.Email, registrationData.Password, registrationData.Username)
 	if err != nil {
 		http.Error(w, `{"error": "`+err.Error()+`"}`, http.StatusBadRequest)
 		return
@@ -73,5 +77,9 @@ func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request)
 
 	// Return token as JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"token": customToken})
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"token":    customToken,
+		"username": username,
+	})
 }

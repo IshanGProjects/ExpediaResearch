@@ -21,12 +21,12 @@ type AuthService struct {
 }
 
 // Login authenticates a user with Firebase Authentication and returns an ID token
-func (s *AuthService) Login(email, password string) (string, error) {
+func (s *AuthService) Login(email, password string) (string, string, error) {
 	// Authenticate with Firebase using email and password
 	user, err := s.FireAuth.GetUserByEmail(context.Background(), email)
 	if err != nil {
 		log.Printf("failed to get user from Firebase: %v", err)
-		return "", errors.New("invalid email or password")
+		return "", "", errors.New("invalid email or password")
 	}
 
 	// Firebase does not expose password verification in Admin SDK.
@@ -36,31 +36,37 @@ func (s *AuthService) Login(email, password string) (string, error) {
 	token, err := s.FireAuth.CustomToken(context.Background(), user.UID)
 	if err != nil {
 		log.Printf("failed to generate custom token: %v", err)
-		return "", errors.New("internal server error")
+		return "", "", errors.New("internal server error")
 	}
 
-	return token, nil
+	userRecord, err := s.FireAuth.GetUser(context.Background(), user.UID)
+	if err != nil {
+		log.Printf("failed to fetch user record: %v", err)
+		return "", "", errors.New("internal server error")
+	}
+	return token, userRecord.DisplayName, nil
 }
 
 // Register creates a new user in Firebase and returns a Firebase custom token
-func (s *AuthService) Register(email, password string) (string, error) {
+func (s *AuthService) Register(email, password, username string) (string, string, error) {
 	// Create a new user in Firebase Authentication
 	params := (&auth.UserToCreate{}).
 		Email(email).
-		Password(password)
+		Password(password).
+		DisplayName(username)
 
 	userRecord, err := s.FireAuth.CreateUser(context.Background(), params)
 	if err != nil {
 		log.Printf("failed to create Firebase user: %v", err)
-		return "", errors.New("failed to create user")
+		return "", "", errors.New("failed to create user")
 	}
 
 	// Generate a Firebase custom token
 	customToken, err := s.FireAuth.CustomToken(context.Background(), userRecord.UID)
 	if err != nil {
 		log.Printf("failed to generate custom token: %v", err)
-		return "", errors.New("internal server error")
+		return "", "", errors.New("internal server error")
 	}
 
-	return customToken, nil
+	return customToken, username, nil
 }
