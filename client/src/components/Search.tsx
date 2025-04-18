@@ -7,6 +7,7 @@ import {
   IconButton,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { useAuth } from "../context/AuthContent";
 
 interface SearchProps {
   userPrompt: string;
@@ -25,6 +26,8 @@ const Search: React.FC<SearchProps> = ({
   error,
   errorMessage,
 }) => {
+  const { firstName } = useAuth();
+
   return (
     <>
       <Box
@@ -39,7 +42,7 @@ const Search: React.FC<SearchProps> = ({
           margin: "0 auto",
         }}
       >
-        <Typography variant="h3">Travel</Typography>
+        <Typography variant="h3">Welcome back {firstName}!</Typography>
         <Typography variant="h6">Find your next adventure</Typography>
 
         {/* Search Input Field with Search Icon */}

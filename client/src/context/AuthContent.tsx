@@ -8,6 +8,7 @@ interface AuthContextType {
   lastName: string | null;
   setUserInfo: (firstName: string | null, lastName: string | null) => void;
   clearUserInfo: () => void;
+  logout: () => void; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,6 +48,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setLastName(null);
   };
 
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("lastName");
+    setTokenState(null);
+    setFirstName(null);
+    setLastName(null);
+  }
+
   const isLoggedIn = !!token;
 
   return (
@@ -59,6 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         lastName,
         setUserInfo,
         clearUserInfo,
+        logout,
       }}
     >
       {children}

@@ -14,12 +14,14 @@ import {
   Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { useAuth } from "../context/AuthContent";
 
 const pages = ["Home", "Discover", "About", "Help"];
 
 const NavBar = () => {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const { isLoggedIn, logout } = useAuth();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -37,10 +39,19 @@ const NavBar = () => {
     navigate("/register");
   };
 
+  const handleLogout = () => {
+    logout();
+    console.log("Logged out successfully.");
+    navigate("/");
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* AppBar */}
-      <AppBar position="static" sx={{ backgroundColor: "#FFEE58", maxWidth: "100%" }}>
+      <AppBar
+        position="static"
+        sx={{ backgroundColor: "#FFEE58", maxWidth: "100%" }}
+      >
         <Toolbar>
           {/* Logo */}
           {/* <img src={logo} style={{ height: 65 }} /> */}
@@ -65,35 +76,54 @@ const NavBar = () => {
               </Button>
             ))}
 
-            {/* Login Button */}
-            <Button
-              color="inherit"
-              variant="outlined"
-              onClick={handleLogin}
-              sx={{
-                color: "black",
-                backgroundColor: "#D3D3D3",
-                borderRadius: 2,
-                ml: 1.25,
-              }}
-            >
-              Login
-            </Button>
+            {/* If user is logged in, show Logout button */}
+            {isLoggedIn ? (
+              <Button
+                color="inherit"
+                variant="outlined"
+                onClick={handleLogout}
+                sx={{
+                  color: "white",
+                  backgroundColor: "black",
+                  ml: 1.25,
+                  borderRadius: 2,
+                }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <>
+                {/* Login Button */}
+                <Button
+                  color="inherit"
+                  variant="outlined"
+                  onClick={handleLogin}
+                  sx={{
+                    color: "black",
+                    backgroundColor: "#D3D3D3",
+                    borderRadius: 2,
+                    ml: 1.25,
+                  }}
+                >
+                  Login
+                </Button>
 
-            {/* Register Button */}
-            <Button
-              color="inherit"
-              variant="outlined"
-              onClick={handleRegister}
-              sx={{
-                color: "white",
-                backgroundColor: "black",
-                ml: 1.25,
-                borderRadius: 2,
-              }}
-            >
-              Register
-            </Button>
+                {/* Register Button */}
+                <Button
+                  color="inherit"
+                  variant="outlined"
+                  onClick={handleRegister}
+                  sx={{
+                    color: "white",
+                    backgroundColor: "black",
+                    ml: 1.25,
+                    borderRadius: 2,
+                  }}
+                >
+                  Register
+                </Button>
+              </>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
