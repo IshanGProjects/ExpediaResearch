@@ -12,6 +12,8 @@ import {
 } from "@mui/material/";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../context/AuthContent";
 
 const RegisterCard = () => {
   const navigate = useNavigate();
@@ -26,9 +28,9 @@ const RegisterCard = () => {
   const [errorPassword, setErrorPassword] = React.useState(false);
   const [errorEmailMessage, setErrorEmailMessage] = React.useState("");
   const [errorPasswordMessage, setErrorPasswordMessage] = React.useState("");
+  const { setToken, setUserInfo } = useAuth();
 
-  // TODO: IMPLEMENT VALIDATION FOR INPUTS AND ERROR HANDLING
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     let isValid = true;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -74,11 +76,17 @@ const RegisterCard = () => {
 
     if (!isValid) return;
 
-    console.log("First Name: ", firstName);
-    console.log("Last Name: ", lastName);
-    console.log("Email: ", email);
-    console.log("Password: ", password);
-    console.log("Signing up...");
+
+    // handle endpoint with all verified data
+    const response = await axios.post("http://localhost:8000/register", {
+      email,
+      password,
+    });
+
+    setToken(response.data.token);
+    setUserInfo(firstName, lastName);
+    navigate("/home");
+    console.log("User registered successfully.");
   };
 
   return (

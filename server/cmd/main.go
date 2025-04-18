@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"go-backend/auth"
 	"go-backend/endpoints"
@@ -16,13 +17,14 @@ import (
 
 func commonMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-		// Handle preflight requests
+		// Handle preflight request
 		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
@@ -30,51 +32,56 @@ func commonMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// respondWithError ensures CORS headers are sent in error responses too
+func respondWithError(w http.ResponseWriter, code int, message string) {
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(map[string]string{"error": message})
+}
+
 func main() {
 	router := mux.NewRouter()
-	router.Use(commonMiddleware)
+	router.Use(commonMiddleware) // ✅ Apply before all routes
 
-	// Create a new service director
-	serviceDirector := factories.NewServiceDirector()
-
-	// Create Firebase instance
+	// Firebase Setup
 	opt := option.WithCredentialsFile("./escapia-login-firebase-adminsdk-fbsvc-aa851b3e38.json")
 	app, err := firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
 		log.Fatalf("Failed to create Firebase app: %v", err)
 	}
 
-	// Create Firebase auth client
 	authClient, err := app.Auth(context.Background())
 	if err != nil {
 		log.Fatalf("Failed to create Firebase auth client: %v", err)
 	}
 
-	//Setup auth and middleware
 	authService := &auth.AuthService{
-		//can connect to database here,
 		FireAuth: authClient,
 	}
 	authController := endpoints.NewAuthController(authService)
 
-	// Firebase login Routes
-	router.HandleFunc("/login", authController.LoginHandler).Methods("POST")
-	router.HandleFunc("/register", authController.RegisterHandler).Methods("POST")
+	// Routes
+	router.HandleFunc("/login", authController.LoginHandler).Methods("POST", "OPTIONS")
+	router.HandleFunc("/register", authController.RegisterHandler).Methods("POST", "OPTIONS")
 
-	// Start a simple server to verify the server is running
+	// Health check route
 	router.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+		w.WriteHeader(http.StatusOK)
 		fmt.Fprintln(w, "Server check verified")
-	}).Methods("GET")
+	}).Methods("GET", "OPTIONS")
 
-	//Process Prompt
+	// Service route
+	serviceDirector := factories.NewServiceDirector()
 	router.HandleFunc("/promptOpenAI", func(w http.ResponseWriter, r *http.Request) {
 		serviceDirector.ProcessPrompt(w, r)
 	}).Methods("POST", "OPTIONS")
 
+	// Run server
 	port := "8000"
 	log.Println("Server listening on port", port)
 	if err := http.ListenAndServe(":"+port, router); err != nil {
 		log.Fatal("Error starting server:", err)
 	}
-
 }

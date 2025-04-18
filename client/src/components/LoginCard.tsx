@@ -12,6 +12,8 @@ import {
   Divider,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useAuth } from "../context/AuthContent";
+import axios from "axios";
 
 const LoginCard = () => {
   const navigate = useNavigate();
@@ -22,8 +24,9 @@ const LoginCard = () => {
   const [errorPassword, setErrorPassword] = React.useState(false);
   const [errorEmailMessage, setErrorEmailMessage] = React.useState("");
   const [errorPasswordMessage, setErrorPasswordMessage] = React.useState("");
+  const { setToken } = useAuth();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     let isValid = true;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -52,9 +55,22 @@ const LoginCard = () => {
 
     if (!isValid) return;
 
-    console.log("Email: ", email);
-    console.log("Password: ", password);
-    console.log("Logging in...");
+
+    // handle endpoint
+    try {
+      const response = await axios.post("http://localhost:8000/login", {
+        email,
+        password,
+      })
+      setToken(response.data.token);
+      console.log("Login successful");
+      navigate("/home");
+    }
+    catch (error) {
+      console.error("Login failed", error);
+      setErrorPassword(true);
+      setErrorPasswordMessage("Invalid email or password");
+    }
   };
 
   return (
