@@ -1,6 +1,7 @@
 import React from "react";
 import NavBar from "../components/NavBar";
 import Search from "../components/Search";
+import ItineraryGrid from "../components/ItenararyCoverContainer";
 import CardGrid from "../components/CardGrid";
 import Footer from "../components/Footer";
 import { Box } from "@mui/material";
@@ -12,6 +13,50 @@ const Home = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
+  const sampleItineraries = [
+    {
+      image: "/default_restaurant_1.jpeg",
+      title: "Rocky Mountain Hike",
+      location: "Colorado, USA",
+      description: "A scenic route through the Rockies with panoramic views.",
+    },
+    {
+      image: "/default_restaurant_1.jpeg",
+      title: "Golden Gate Adventure",
+      location: "San Francisco, CA",
+      description: "Explore the city by the bay and its famous landmarks.",
+    },
+    {
+      image: "/default_restaurant_1.jpeg",
+      title: "Golden Gate Adventure",
+      location: "San Francisco, CA",
+      description: "Explore the city by the bay and its famous landmarks.",
+    },
+    {
+      image: "/default_restaurant_1.jpeg",
+      title: "Golden Gate Adventure",
+      location: "San Francisco, CA",
+      description: "Explore the city by the bay and its famous landmarks.",
+    },
+    {
+      image: "/default_restaurant_1.jpeg",
+      title: "Golden Gate Adventure",
+      location: "San Francisco, CA",
+      description: "Explore the city by the bay and its famous landmarks.",
+    },
+    {
+      image: "/default_restaurant_1.jpeg",
+      title: "Golden Gate Adventure",
+      location: "San Francisco, CA",
+      description: "Explore the city by the bay and its famous landmarks.",
+    },
+    {
+      image: "/default_restaurant_1.jpeg",
+      title: "Golden Gate Adventure",
+      location: "San Francisco, CA",
+      description: "Explore the city by the bay and its famous landmarks.",
+    },
+  ];
 
   function formatField(value: any): string {
     if (typeof value === "string") return value;
@@ -85,6 +130,7 @@ const Home = () => {
             error={error}
             errorMessage={errorMessage}
           />
+          <ItineraryGrid itineraries={sampleItineraries} />;
           <CardGrid searchResults={searchResults} loading={loading} />
         </Box>
 
