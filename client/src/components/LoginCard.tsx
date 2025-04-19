@@ -24,7 +24,7 @@ const LoginCard = () => {
   const [errorPassword, setErrorPassword] = React.useState(false);
   const [errorEmailMessage, setErrorEmailMessage] = React.useState("");
   const [errorPasswordMessage, setErrorPasswordMessage] = React.useState("");
-  const { setToken } = useAuth();
+  const { setToken, setUserInfo } = useAuth();
 
   const handleLogin = async () => {
     let isValid = true;
@@ -62,7 +62,16 @@ const LoginCard = () => {
         email,
         password,
       })
+
+
+      // parse username to split into first and last name
+      const username = response.data.username;
+      const firstName = username.split(" ")[0];
+      const lastName = username.split(" ")[1];
+      
       setToken(response.data.token);
+      setUserInfo(firstName, lastName);
+
       console.log("Login successful");
       navigate("/home");
     }

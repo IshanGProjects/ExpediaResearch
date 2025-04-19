@@ -75,12 +75,13 @@ const RegisterCard = () => {
     }
 
     if (!isValid) return;
-
+    const username = firstName + " " + lastName;
 
     // handle endpoint with all verified data
     const response = await axios.post("http://localhost:8000/register", {
       email,
       password,
+      username,
     });
 
     setToken(response.data.token);
