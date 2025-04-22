@@ -55,31 +55,34 @@ const LoginCard = () => {
 
     if (!isValid) return;
 
-
     // handle endpoint
     try {
       const response = await axios.post("http://localhost:8000/login", {
         email,
         password,
-      })
-
+      });
 
       // parse username to split into first and last name
       const username = response.data.username;
       const firstName = username.split(" ")[0];
       const lastName = username.split(" ")[1];
-      
+
       setToken(response.data.token);
       setUserInfo(firstName, lastName);
 
       console.log("Login successful");
       navigate("/home");
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Login failed", error);
       setErrorPassword(true);
       setErrorPasswordMessage("Invalid email or password");
     }
+  };
+
+  const handleResetPassword = () => {
+    console.log("Reset password clicked");
+
+    // TODO: Implement reset password functionality
   };
 
   return (
@@ -167,6 +170,16 @@ const LoginCard = () => {
               }}
             />
 
+            {/* Reset Password Button */}
+            <Typography
+              variant="body2"
+              sx={{ mt: 1, cursor: "pointer", textDecoration: "underline" }}
+              color="primary"
+              onClick={handleResetPassword}
+            >
+              Forgot your password?
+            </Typography>
+
             {/* Login Button */}
             <Button
               fullWidth
@@ -184,7 +197,7 @@ const LoginCard = () => {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => navigate('/register')}
+              onClick={() => navigate("/register")}
               sx={{
                 mt: 2,
                 py: 1.5,
