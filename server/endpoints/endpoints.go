@@ -83,3 +83,30 @@ func (c *AuthController) RegisterHandler(w http.ResponseWriter, r *http.Request)
 		"username": username,
 	})
 }
+
+func (c *AuthController) ResetHandler(w http.ResponseWriter, r *http.Request) {
+	var registrationData struct {
+		Email string `json:"email"`
+	}
+
+	// Parse the JSON body
+	if err := json.NewDecoder(r.Body).Decode(&registrationData); err != nil {
+		http.Error(w, `{"error": "Invalid request body"}`, http.StatusBadRequest)
+		return
+	}
+
+	// Basic validation
+	if registrationData.Email == "" {
+		http.Error(w, `{"error": "Email is required"}`, http.StatusBadRequest)
+		return
+	}
+
+	err := c.authService.Reset(registrationData.Email)
+	if err != nil {
+		http.Error(w, `{"error": "`+err.Error()+`"}`, http.StatusBadRequest)
+		return
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"status": "Password reset link was successfully sent. Check your inbox"})
+	}
+}

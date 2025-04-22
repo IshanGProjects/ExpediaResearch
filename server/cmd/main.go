@@ -64,6 +64,7 @@ func main() {
 	// Routes
 	router.HandleFunc("/login", authController.LoginHandler).Methods("POST", "OPTIONS")
 	router.HandleFunc("/register", authController.RegisterHandler).Methods("POST", "OPTIONS")
+	router.HandleFunc("/resetpwd", authController.ResetHandler).Methods("POST")
 
 	// Health check route
 	router.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
