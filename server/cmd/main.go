@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 
+	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 	"github.com/gorilla/mux"
 	"google.golang.org/api/option"
@@ -30,6 +31,8 @@ func commonMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+var DB *firestore.Client
+
 func main() {
 	router := mux.NewRouter()
 	router.Use(commonMiddleware)
@@ -49,6 +52,18 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create Firebase auth client: %v", err)
 	}
+
+	sa := option.WithCredentialsFile("./escapia-login-firebase-adminsdk-fbsvc-aa851b3e38.json")
+	app, err = firebase.NewApp(context.Background(), nil, sa)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	client, err := app.Firestore(context.Background())
+	if err != nil {
+		log.Fatalln(err)
+	}
+	DB = client
+	//defer client.Close()
 
 	//Setup auth and middleware
 	authService := &auth.AuthService{
