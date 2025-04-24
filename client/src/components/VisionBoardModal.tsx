@@ -10,6 +10,10 @@ import { ChromePicker } from "react-color";
 import { v4 as uuidv4 } from "uuid";
 import { useState, useEffect, useRef } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogTitle from "@mui/material/DialogTitle";
 
 import DefaultRestaurantPic from "../assets/default_restaurant_1.jpeg";
 import DefaultRestaurantPic2 from "../assets/default_restaurant_2.jpeg";
@@ -82,9 +86,8 @@ export default function VisionBoardModal({
   const [layers, setLayers] = useState<Layer[]>([]);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [showTools, setShowTools] = useState(false);
-  const [latestPositions, setLatestPositions] = useState<
-    Record<string, { x: number; y: number }>
-  >({});
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)");
   const toolRef = useRef(null);
   const canvasRef = useRef(null);
@@ -108,9 +111,10 @@ export default function VisionBoardModal({
     ]);
     setSelectedLayerId(id);
     setShowTools(true);
+    setIsSaved(false);
   };
 
-  const updateSelectedLayerStyle = (key: keyof Layer["style"], value: any) => {
+  const updateSelectedLayerStyle = (key: string, value: any) => {
     setLayers((prev) =>
       prev.map((layer) =>
         layer.id === selectedLayerId
@@ -118,6 +122,7 @@ export default function VisionBoardModal({
           : layer
       )
     );
+    setIsSaved(false);
   };
 
   const saveToFirestoreTemplate = async () => {
@@ -136,6 +141,7 @@ export default function VisionBoardModal({
       ),
     };
     console.log("Template save payload:", canvasPayload);
+    setIsSaved(true);
   };
 
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
@@ -155,19 +161,31 @@ export default function VisionBoardModal({
   }, [open, layers.length]);
 
   const handleDragStop = (id: string, data: { x: number; y: number }) => {
-    setLatestPositions((prev) => ({ ...prev, [id]: { x: data.x, y: data.y } }));
+    const newPos = { x: data.x, y: data.y };
     setLayers((prev) =>
       prev.map((layer) =>
-        layer.id === id
-          ? { ...layer, position: { x: data.x, y: data.y } }
-          : layer
+        layer.id === id ? { ...layer, position: newPos } : layer
       )
     );
+    setIsSaved(false);
+  };
+
+  const handleCloseEditor = () => {
+    if (!isSaved) {
+      setShowExitConfirm(true);
+    } else {
+      onClose();
+    }
+  };
+
+  const confirmExit = () => {
+    setShowExitConfirm(false);
+    onClose();
   };
 
   return (
     <>
-      <Modal open={open} onClose={onClose}>
+      <Modal open={open} onClose={handleCloseEditor}>
         <ModalDialog layout="fullscreen" sx={{ overflow: "hidden" }}>
           <Box
             sx={{
@@ -209,7 +227,7 @@ export default function VisionBoardModal({
                             ? "2px dashed #1976d2"
                             : "none",
                         p: 0.5,
-                        pointerEvents: showTools ? "auto" : "none",
+                        pointerEvents: "auto",
                       }}
                     >
                       {layer.type === "text" ? (
@@ -229,7 +247,7 @@ export default function VisionBoardModal({
                   return showTools ? (
                     <Draggable
                       key={layer.id}
-                      position={latestPositions[layer.id] || layer.position}
+                      position={layer.position}
                       onStop={(e, data) => handleDragStop(layer.id, data)}
                       enableUserSelectHack={false}
                     >
@@ -239,7 +257,8 @@ export default function VisionBoardModal({
                     <Box
                       key={layer.id}
                       style={{
-                        ...layer.position,
+                        left: layer.position.x,
+                        top: layer.position.y,
                         position: "absolute",
                       }}
                     >
@@ -248,17 +267,42 @@ export default function VisionBoardModal({
                   );
                 })}
               </Box>
-              <Button
-                onClick={() => setShowTools((prev) => !prev)}
-                sx={{ position: "absolute", top: 16, left: 16, zIndex: 999 }}
+              <Box
+                sx={{ position: "absolute", top: 16, left: "50%", zIndex: 999 }}
               >
-                {showTools ? "Hide Tools" : "Edit Canvas"}
-              </Button>
+                <Button
+                  onClick={() => setShowTools((prev) => !prev)}
+                  sx={{ backgroundColor: "#FFEE58", color: "black" }}
+                >
+                  {showTools ? "Hide Tools" : "Edit Canvas"}
+                </Button>
+              </Box>
               <Button
                 onClick={saveToFirestoreTemplate}
-                sx={{ position: "absolute", top: 16, right: 16, zIndex: 999 }}
+                sx={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  zIndex: 999,
+                  backgroundColor: "#FFEE58",
+                  color: "black",
+                }}
               >
                 Save
+              </Button>
+              <Button
+                onClick={handleCloseEditor}
+                startDecorator={<ArrowBackIcon />}
+                sx={{
+                  backgroundColor: "#FFEE58",
+                  color: "black",
+                  position: "absolute",
+                  top: 16,
+                  left: 16,
+                  zIndex: 999,
+                }}
+              >
+                Back
               </Button>
             </Box>
 
@@ -278,7 +322,11 @@ export default function VisionBoardModal({
                 <Typography level="h4" mb={2}>
                   Vision Tools
                 </Typography>
-                <Button onClick={addTextLayer} fullWidth sx={{ mb: 2 }}>
+                <Button
+                  onClick={addTextLayer}
+                  fullWidth
+                  sx={{ mb: 2, backgroundColor: "#FFEE58", color: "black" }}
+                >
                   Add Text
                 </Button>
                 {selectedLayer && selectedLayer.type === "text" && (
@@ -291,6 +339,14 @@ export default function VisionBoardModal({
                       }
                       min={10}
                       max={72}
+                      sx={{
+                        "& .MuiSlider-thumb": {
+                          borderColor: "#000000",
+                          backgroundColor: "#000000",
+                        },
+                        "& .MuiSlider-track": { backgroundColor: "#FFEE58" },
+                        "& .MuiSlider-rail": { backgroundColor: "#FFEE58" },
+                      }}
                     />
                     <Typography level="body-md" sx={{ mt: 2 }}>
                       Font
@@ -331,6 +387,14 @@ export default function VisionBoardModal({
                       }
                       min={50}
                       max={400}
+                      sx={{
+                        "& .MuiSlider-thumb": {
+                          borderColor: "#000000",
+                          backgroundColor: "#000000",
+                        },
+                        "& .MuiSlider-track": { backgroundColor: "#FFEE58" },
+                        "& .MuiSlider-rail": { backgroundColor: "#FFEE58" },
+                      }}
                     />
                   </>
                 )}
@@ -359,6 +423,21 @@ export default function VisionBoardModal({
           </ModalDialog>
         </Modal>
       )}
+
+      <Dialog open={showExitConfirm} onClose={() => setShowExitConfirm(false)}>
+        <DialogTitle>Exit without saving?</DialogTitle>
+        <DialogActions>
+          <Button
+            onClick={() => setShowExitConfirm(false)}
+            sx={{ backgroundColor: "#FFEE58", color: "black" }}
+          >
+            Cancel
+          </Button>
+          <Button color="danger" onClick={confirmExit}>
+            Exit
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
