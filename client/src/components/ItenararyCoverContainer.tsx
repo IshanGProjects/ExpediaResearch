@@ -109,7 +109,6 @@ export default function ItineraryGrid({ itineraries }: ItineraryGridProps) {
       <VisionBoardModal
         open={visionOpen}
         onClose={() => setVisionOpen(false)}
-        itineraries={itineraries}
       />
     </Box>
   );
