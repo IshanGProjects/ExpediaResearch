@@ -5,14 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"bytes"
 	"net/http"
-	"golang.org/x/net/html"
-	"net/url"
 	"os"
 	"strings"
-	"time"
 )
 
 // MapsFactory struct
@@ -36,7 +32,7 @@ var _ AbstractProduct = (*MapsProduct)(nil)
 func (p *MapsProduct) PerformAction(data map[string]string) (map[string]interface{}, error) {
 	prompt, ok := data["prompt"]
 	if !ok || prompt == "" {
-		return nil, fmt.Errorf("missing 'prompt' key")
+		return nil, fmt.Errorf("GMAPS - missing 'prompt' key")
 	}
 
 	// Ask LLM to extract just the query
@@ -48,7 +44,7 @@ func (p *MapsProduct) PerformAction(data map[string]string) (map[string]interfac
 	location, locOk := queryParams["location"]
 	searchTerm, termOk := queryParams["search_term"]
 	if !locOk || location == "" || !termOk || searchTerm == "" {
-		return nil, fmt.Errorf("LLM did not return valid 'location' or 'search_term'")
+		return nil, fmt.Errorf("GMAPS - LLM did not return valid 'location' or 'search_term'")
 	}
 
 	query := []string{location, searchTerm}
@@ -57,7 +53,7 @@ func (p *MapsProduct) PerformAction(data map[string]string) (map[string]interfac
 }
 
 // performHTTPRequest performs the GET request with query and date range
-func (p *MapsProduct) performHTTPRequest(query string[]) (map[string]interface{}, error) {
+func (p *MapsProduct) performHTTPRequest(query []string) (map[string]interface{}, error) {
 	
 	// Extract location and search term from the query
 	location := query[0]
@@ -76,9 +72,9 @@ func (p *MapsProduct) performHTTPRequest(query string[]) (map[string]interface{}
 	}
 
 	// Create a POST request with the JSON body
-	req, err := http.NewRequest("GET", p.MapsProductBaseUrl, bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", p.MapsProductBaseUrl, bytes.NewBuffer(body))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %v", err)
+		return nil, fmt.Errorf("GMAPS - failed to create request: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
@@ -86,22 +82,27 @@ func (p *MapsProduct) performHTTPRequest(query string[]) (map[string]interface{}
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send request: %v", err)
+		return nil, fmt.Errorf("GMAPS - failed to send request: %v", err)
 	}
 	defer resp.Body.Close()
 
-	// Read and print response
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
+	// Decode the JSON response
+	var results interface{}
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&results); err != nil {
+		return nil, fmt.Errorf("GMAPS - error decoding JSON response: %v", err)
 	}
 
-	doc, err := html.Parse(bytes.NewReader(body))
-	if err != nil {
-		panic(err)
+	// Ensure the results are in the expected format
+	switch v := results.(type) {
+	case map[string]interface{}:
+		return v, nil
+	case []interface{}:
+		fmt.Printf("GMAPS - Response Body: %s\n", v)
+		return map[string]interface{}{"results": v}, nil
+	default:
+		return nil, fmt.Errorf("GMAPS - unexpected JSON response format")
 	}
-
-	var targetDivs []string
 
 }
 
@@ -110,6 +111,7 @@ func AnalyzeMapsPromptWithLLM(prompt string) (map[string]string, error) {
 	apiKey := os.Getenv("OPENAI_API_KEY")
 	endpoint := "https://api.openai.com/v1/chat/completions"
 
+	// Extract the query from the prompt using LLM
 	requestBody := map[string]interface{}{
 		"model": "gpt-3.5-turbo",
 		"messages": []map[string]string{
@@ -124,12 +126,12 @@ func AnalyzeMapsPromptWithLLM(prompt string) (map[string]string, error) {
 
 	body, err := json.Marshal(requestBody)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal request body: %v", err)
+		return nil, fmt.Errorf("GMAPS - failed to marshal request body: %v", err)
 	}
 
-	req, err := http.NewRequest("GET", endpoint, strings.NewReader(string(body)))
+	req, err := http.NewRequest("POST", endpoint, strings.NewReader(string(body)))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %v", err)
+		return nil, fmt.Errorf("GMAPS - failed to create request: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+apiKey)
@@ -137,14 +139,16 @@ func AnalyzeMapsPromptWithLLM(prompt string) (map[string]string, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %v", err)
+		return nil, fmt.Errorf("GMAPS - failed to make request: %v", err)
 	}
 	defer resp.Body.Close()
-
+	
 	responseData, err := io.ReadAll(resp.Body)
+	
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response data: %v", err)
 	}
+
 
 	type Response struct {
 		Choices []struct {
@@ -153,16 +157,22 @@ func AnalyzeMapsPromptWithLLM(prompt string) (map[string]string, error) {
 			} `json:"message"`
 		} `json:"choices"`
 	}
+	var response Response
+
 	if err := json.Unmarshal(responseData, &response); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal LLM response: %v", err)
+		return nil, fmt.Errorf("GMAPS - failed to unmarshal LLM response: %v", err)
 	}
+
+	fmt.Sprintf("GMAPS - The content is: ", response.Choices[0].Message.Content)
+	content := response.Choices[0].Message.Content
+	
 	if len(response.Choices) == 0 {
-		return nil, errors.New("no LLM response")
+		return nil, errors.New("GMAPS - no LLM response")
 	}
 
 	var result map[string]string
 	if err := json.Unmarshal([]byte(content), &result); err != nil {
-		return nil, fmt.Errorf("failed to decode LLM JSON: %v\nContent: %s", err, content)
+		return nil, fmt.Errorf("GMAPS - failed to decode LLM JSON: %v\nContent: %s", err, content)
 	}
 	return result, nil
 }

@@ -7,7 +7,7 @@ app = Flask(__name__)
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
 # Route to handle search requests from the client
-@app.route('/search', methods=['GET'])
+@app.route('/search', methods=['POST'])
 def search_places():
 
     # Extract parameters (Locations/Search_Term) from the request
@@ -16,7 +16,7 @@ def search_places():
     search_term = data.get('search_term')
 
     if not location or not search_term:
-        return jsonify({'error': 'Missing required parameters: location and search_term'}), 400
+        return jsonify({'error': 'GMAPS - Missing required parameters: location and search_term'}), 400
 
     # Google Places Text Search API endpoint
     url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
@@ -29,11 +29,14 @@ def search_places():
 
     # Step 1: Fetch data from Google Places API
     response = requests.get(url, params=params)
-    
-    if response.status_code != 200:
+
+    # Fetch the entire response without limiting the results
+    if response.status_code == 200:
+        response_data = response.json()
+    else:
         return jsonify({'error': 'Failed to fetch data from Google Places API'}), 500
 
-    results_text = response.json().get('results', [])
+    results_text = response_data.get('results', [])
 
     # Step 2: Fetch additional details for each place
 
@@ -87,10 +90,10 @@ def search_places():
             'details': results_details[i].get('editorial_summary'),
             'date': results_details[i].get('current_opening_hours'),
             'link': results_details[i].get('website')
-        } for i in range(len(results_text))
+        } for i in range(len(results_text) if len(results_text) < 6 else 5)  # Limit to 5 results for the client
     ]
 
-    return jsonify({'results': extracted_data})
+    return jsonify({'choices': extracted_data})
 
 
 if __name__ == '__main__':
