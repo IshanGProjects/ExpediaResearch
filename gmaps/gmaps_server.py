@@ -81,10 +81,12 @@ def search_places():
 
 
     # Step 4: Extract relevant data from the results
-
+    extracted_data = []
+    if len(results_text) == 0:
+        return jsonify({'error': 'No results found for the given search term.'}), 404
     extracted_data = [
         {
-            'activity_name': results_text[i].get('name'),
+            'name': results_text[i].get('name'),
             'image': results_photos[i],
             'location': results_text[i].get('formatted_address'),
             'details': results_details[i].get('editorial_summary'),
@@ -93,7 +95,7 @@ def search_places():
         } for i in range(len(results_text) if len(results_text) < 7 else 6)  # Limit to 5 results for the client
     ]
 
-    return jsonify({'choices': extracted_data})
+    return jsonify({'data': extracted_data})
 
 
 if __name__ == '__main__':
