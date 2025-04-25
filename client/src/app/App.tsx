@@ -1,10 +1,17 @@
 import React from "react";
-import { SampleComponent } from "../components";
-import OpenAIFrontend from "../components/OpenAIFrontend";
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "../routes";
+
 
 function App() {
   // return <SampleComponent />;
-  return <OpenAIFrontend />;
+  return (
+    <>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </>
+  );
 }
 
 export default App;

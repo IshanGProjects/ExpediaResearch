@@ -1,20 +1,6 @@
-# Use a more recent Node.js runtime as a parent image
-FROM node:16
+FROM golang:1.23
 
-RUN mkdir -p /app
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY package.json /app
-COPY package-lock.json /app
-
-# Install dependencies
-RUN npm install
-
-# Create a dedicated volume for node_modules to prevent local development overwrites
-VOLUME /app/node_modules
-
-# Copy the rest of the application code to the working directory
 COPY . .
-
-
-CMD ["npm", "run dev"]
+RUN go mod tidy
