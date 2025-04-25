@@ -8,6 +8,7 @@ import {
   Stack,
   Link,
 } from "@mui/material";
+import ItineraryDialog from "./ItineraryDialog";
 
 type SearchResult = {
   service: string;
@@ -31,78 +32,92 @@ const CardModal: React.FC<CardModalProps> = ({
   onClose,
   searchResult,
 }) => {
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+
   if (!searchResult) return null;
+
   const handleSaveEvent = () => {
-    console.log(searchResult);
+    setDialogOpen(true);
   };
 
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+  };  
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: { xs: "80%", sm: 400 },
-          bgcolor: "background.paper",
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-        }}
-      >
-        {/* Title */}
-        <Typography variant="h5" fontWeight={600} gutterBottom>
-          {searchResult.activity_name}
-        </Typography>
+    <>
+      <Modal open={open} onClose={onClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: { xs: "80%", sm: 400 },
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          {/* Title */}
+          <Typography variant="h5" fontWeight={600} gutterBottom>
+            {searchResult.activity_name}
+          </Typography>
 
-        <Divider sx={{ mb: 2 }} />
+          <Divider sx={{ mb: 2 }} />
 
-        {/* Details */}
-        <Stack spacing={1}>
-          {searchResult.details !== "" && (
-            <>
-              <Typography variant="body1" fontWeight={500}>
-                Details:
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {searchResult.details}
-              </Typography>
-            </>
-          )}
+          {/* Details */}
+          <Stack spacing={1}>
+            {searchResult.details !== "" && (
+              <>
+                <Typography variant="body1" fontWeight={500}>
+                  Details:
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {searchResult.details}
+                </Typography>
+              </>
+            )}
 
-          {searchResult.location !== "" && (
-            <>
-              <Typography variant="body1" fontWeight={500} mt={2}>
-                Location:
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {searchResult.location}
-              </Typography>
-            </>
-          )}
+            {searchResult.location !== "" && (
+              <>
+                <Typography variant="body1" fontWeight={500} mt={2}>
+                  Location:
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {searchResult.location}
+                </Typography>
+              </>
+            )}
 
-          {(searchResult.date?.trim() || searchResult.time?.trim()) && (
-            <>
-              <Typography variant="body1" fontWeight={500} mt={2}>
-                Date & Time:
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {searchResult.date ? searchResult.date : ""}
-                {searchResult.time ? ` at ${searchResult.time}` : ""}
-              </Typography>
-            </>
-          )}
+            {(searchResult.date?.trim() || searchResult.time?.trim()) && (
+              <>
+                <Typography variant="body1" fontWeight={500} mt={2}>
+                  Date & Time:
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {searchResult.date ? searchResult.date : ""}
+                  {searchResult.time ? ` at ${searchResult.time}` : ""}
+                </Typography>
+              </>
+            )}
 
-          {searchResult.link !== "" && (
-            <Link href={searchResult.link} target="_blank">Link</Link>
-          )}
-        </Stack>
-        <Button variant="contained" onClick={handleSaveEvent} sx={{ mt: 2 }}>
-          Save Event
-        </Button>
-      </Box>
-    </Modal>
+            {searchResult.link !== "" && (
+              <Link href={searchResult.link} target="_blank">
+                Link
+              </Link>
+            )}
+          </Stack>
+          <Button variant="contained" onClick={handleSaveEvent} sx={{ mt: 2 }}>
+            Save Event
+          </Button>
+        </Box>
+      </Modal>
+
+      {/* Itinerary Dialog */}
+      <ItineraryDialog open={dialogOpen} onClose={handleDialogClose} cardData={searchResult} />
+    </>
   );
 };
 
