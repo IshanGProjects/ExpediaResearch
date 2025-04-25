@@ -1,0 +1,39 @@
+users (collection)
+└── {userId} 
+    └── itineraries 
+        └── {itineraryId} 
+            ├── cover: {
+            │     image: string,
+            │     title: string,
+            │     location: string,
+            │     description: string
+            │ }
+            ├── layers: [
+            │   {
+            │     id: string,
+            │     type: "text" | "image",
+            │     content: string,
+            │     position: { x: number, y: number },
+            │     style: {
+            │       fontSize?: number,
+            │       fontFamily?: string,
+            │       color?: string,
+            │       zIndex: number,
+            │       width?: number
+            │     },
+            │     metadata?: object
+            │   }
+            │ ]
+
+
+
+
+
+
+
+Method | Route                                   | Description
+GET    | /users/:userId/itineraries              | Fetch all itineraries for a user
+GET    | /users/:userId/itineraries/:itineraryId | Fetch specific itinerary
+POST   | /users/:userId/itineraries              | Create a new itinerary
+PUT    | /users/:userId/itineraries/:itineraryId | Update an existing itinerary
+DELETE | /users/:userId/itineraries/:itineraryId | Delete an itinerary
