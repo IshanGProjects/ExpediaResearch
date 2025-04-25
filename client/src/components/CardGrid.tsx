@@ -26,6 +26,7 @@ import DefaultHotelPic9 from "../assets/hotel_9.jpeg";
 import DefaultHotelPic10 from "../assets/hotel_10.jpg";
 import DefaultHotelPic11 from "../assets/hotel_11.jpg";
 import DefaultHotelPic12 from "../assets/hotel_12.jpeg";
+import DefaultLocationPic from "../assets/locations_1.png";
 import {
   Grid2 as Grid,
   Card,
@@ -159,7 +160,6 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                     }}
                   >
                     {result.service === "Restaurants" ? (
-                      
                       <CardMedia
                         component="img"
                         height={250}
@@ -182,11 +182,16 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                         image={result.image || DefaultHotelImages[Math.floor(Math.random() * DefaultHotelImages.length)]}
                         alt={result.activity_name}
                         sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
-                      />
-                    ): null}
-                    
-                    
-
+                        />
+                      ) : result.service === "Locations" ? (
+                        <CardMedia
+                          component="img"
+                          height={250}
+                          image={result.image || DefaultLocationPic}
+                          alt={result.activity_name}
+                          sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
+                        />
+                      ): null}
                       {/* Overlay */}
                       <Box
                         sx={{

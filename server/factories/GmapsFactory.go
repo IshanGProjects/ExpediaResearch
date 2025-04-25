@@ -96,6 +96,10 @@ func (p *MapsProduct) performHTTPRequest(query []string) (map[string]interface{}
 	// Ensure the results are in the expected format
 	switch v := results.(type) {
 	case map[string]interface{}:
+		// Check if the "activities" field exists and is a list
+		if activities, ok := v["activities"].([]interface{}); ok {
+			return map[string]interface{}{"results": activities}, nil
+		}
 		return v, nil
 	case []interface{}:
 		fmt.Printf("GMAPS - Response Body: %s\n", v)

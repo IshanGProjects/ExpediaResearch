@@ -90,7 +90,7 @@ def search_places():
             'details': results_details[i].get('editorial_summary'),
             'date': results_details[i].get('current_opening_hours'),
             'link': results_details[i].get('website')
-        } for i in range(len(results_text) if len(results_text) < 6 else 5)  # Limit to 5 results for the client
+        } for i in range(len(results_text) if len(results_text) < 7 else 6)  # Limit to 5 results for the client
     ]
 
     return jsonify({'choices': extracted_data})
