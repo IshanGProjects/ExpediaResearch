@@ -99,7 +99,7 @@ export default function VisionBoardModal({
   const { token } = useAuth();
 
   // Fetch existing cards
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchCards = async () => {
       try {
         if (!token || typeof token !== "string") {
@@ -114,7 +114,9 @@ export default function VisionBoardModal({
             itineraryID: itineraryID,
           }
         );
-        setExistingCards(response.data || []);
+
+        const { layers } = response.data || {};
+        setExistingCards(layers || []);
       } catch (error) {
         console.error("Error fetching itineraries:", error);
       }
@@ -178,20 +180,30 @@ export default function VisionBoardModal({
   };
 
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
+  useEffect(() => {
+    console.log("Existing cards:", existingCards);
+  }, [existingCards]);
+  const hasHydratedRef = useRef(false);
 
   useEffect(() => {
-    if (open && layers.length === 0 && Array.isArray(existingCards)) {
+    if (open && existingCards.length > 0 && !hasHydratedRef.current) {
       const preloadedLayers = existingCards.map((item, index) => ({
         id: uuidv4(),
         type: "image",
-        content: item.image,
+        content: item.metadata?.image || "", // ✅ pull from metadata
         position: { x: 100 + index * 30, y: 100 + index * 30 },
         style: { zIndex: index + 1, width: 150 },
-        metadata: item,
+        metadata: item.metadata || item, // support both raw or wrapped
       }));
       setLayers(preloadedLayers);
+      hasHydratedRef.current = true;
     }
-  }, [open, layers.length, existingCards]);
+
+    if (!open) {
+      hasHydratedRef.current = false;
+      setLayers([]);
+    }
+  }, [open, existingCards]);
 
   const handleDragStop = (id: string, data: { x: number; y: number }) => {
     const newPos = { x: data.x, y: data.y };
@@ -439,18 +451,51 @@ export default function VisionBoardModal({
 
       {!showTools && (
         <Modal open={!!selectedCard} onClose={() => setSelectedCard(null)}>
-          <ModalDialog sx={{ width: 350, borderRadius: "lg", p: 2 }}>
+          <ModalDialog sx={{ width: 400, borderRadius: "lg", p: 2 }}>
             {selectedCard && (
               <Box>
                 <Typography level="title-md" fontWeight="lg" gutterBottom>
                   {selectedCard.activity_name}
                 </Typography>
-                <Typography level="body-sm" gutterBottom>
-                  {selectedCard.location}
-                </Typography>
-                <Typography level="body-sm" color="neutral">
-                  {selectedCard.date} at {selectedCard.time}
-                </Typography>
+
+                {selectedCard.location && (
+                  <Typography level="body-sm" gutterBottom>
+                    📍 {selectedCard.location}
+                  </Typography>
+                )}
+
+                {(selectedCard.date || selectedCard.time) && (
+                  <Typography level="body-sm" color="neutral" gutterBottom>
+                    🗓 {selectedCard.date} {selectedCard.time}
+                  </Typography>
+                )}
+
+                {selectedCard.details && (
+                  <Typography level="body-sm" gutterBottom>
+                    📝 {selectedCard.details}
+                  </Typography>
+                )}
+
+                {selectedCard.service && (
+                  <Typography level="body-sm" gutterBottom>
+                    🔖 Service: {selectedCard.service}
+                  </Typography>
+                )}
+
+                {selectedCard.link && (
+                  <Typography
+                    level="body-sm"
+                    sx={{
+                      mt: 1,
+                      color: "#1976d2",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => window.open(selectedCard.link, "_blank")}
+                  >
+                    🔗 View More
+                  </Typography>
+                )}
               </Box>
             )}
           </ModalDialog>
