@@ -130,7 +130,7 @@ const ItineraryDialog: React.FC<ItineraryDialogProps> = ({
   // TODO: add logic to save itinerary to db
   const handleCreateItinerary = () => {
     // handle endpoint
-    const itineraryID = uuidv4(); // Generate a unique identifier
+    const itineraryID = title; // Generate a unique identifier
     const response = axios.put("http://localhost:8000/putitinerary", {
       userID: token,
       itineraryID: itineraryID,
@@ -173,9 +173,10 @@ const ItineraryDialog: React.FC<ItineraryDialogProps> = ({
             existingItineraries.map((itinerary) => (
               <ListItem key={itinerary.itineraryID}>
                 <ListItemButton
-                  onClick={() =>
-                    handleSaveToExistingItinerary(itinerary.itineraryID)
-                  }
+                  onClick={() => {
+                    console.log("Selected Itinerary ID:", itinerary);
+                    handleSaveToExistingItinerary(itinerary.cover.title);
+                  }}
                 >
                   <Typography>{itinerary.cover.title}</Typography>
                 </ListItemButton>
