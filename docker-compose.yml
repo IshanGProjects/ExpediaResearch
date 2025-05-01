@@ -81,6 +81,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 12
+  gmaps:
+    build:
+      context: ./gmaps  # or wherever your Dockerfile + gmaps_server.py is
+    ports:
+      - "8081:8081"
+    env_file:
+      - ./gmaps/.env
 
 volumes:
   qdrant_storage:

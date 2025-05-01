@@ -38,7 +38,7 @@ func FormatData(service string, combinedData []CombinedData) ([]interface{}, err
 
 	correctedData := bytes.ReplaceAll(jsonData, []byte("`"), []byte("'"))
 	correctedDataString := string(correctedData)
-
+	fmt.Println("The preformatted content is: ", correctedDataString)
 	requestBody := map[string]interface{}{
 		"model": "gpt-3.5-turbo",
 		"messages": []map[string]string{
@@ -48,7 +48,7 @@ func FormatData(service string, combinedData []CombinedData) ([]interface{}, err
 			},
 			{
 				"role": "user",
-				"content": fmt.Sprintf("Format the following combined raw data into the standardized activity format, where these fields make up a json file:\n\n%s.\n"+
+				"content": fmt.Sprintf("Format the following combined raw data into the standardized activity format, where these fields make up a json file. Have the json file be a list of standardized activities, without an 'activities' field encapsulating it:\n\n%s.\n"+
 					"Extract activities in a standardized format:\n"+
 					"- image: URL or image data for the activity.\n"+
 					"- activity_name: Name or title of the activity.\n"+
@@ -107,7 +107,7 @@ func FormatData(service string, combinedData []CombinedData) ([]interface{}, err
 
 	llmOutput := response.Choices[0].Message.Content
 
-	fmt.Println("The content is: ", llmOutput)
+	fmt.Println("The formatted content is: ", llmOutput)
 
 	// Clean up the output if necessary
 	cleanedOutput := strings.TrimSpace(llmOutput)
