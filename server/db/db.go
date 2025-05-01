@@ -57,7 +57,7 @@ func NewDBController(dbService *firestore.Client) *DBController {
 
 // Login handles the POST /login route and login a new user with the provided credentials
 func (c *DBController) GetItineraries(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("entered route")
+	// fmt.Println("entered route")
 	var userData struct {
 		UserID string `json:"userID"`
 	}
@@ -88,7 +88,7 @@ func (c *DBController) GetItineraries(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 		itineraryArray = append(itineraryArray, itinerary)
-		log.Printf("Itinerary: %+v", itinerary)
+		// log.Printf("Itinerary: %+v", itinerary)
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(itineraryArray)
