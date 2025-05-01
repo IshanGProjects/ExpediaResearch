@@ -111,12 +111,14 @@ export default function VisionBoardModal({
           "http://localhost:8000/getitinerarybyid",
           {
             userID: token.trim(),
-            itineraryID: itineraryID,
+            itineraryID: itineraryID.trim(),
           }
         );
+        console.log("Itinerary ID:", itineraryID.trim());
+        console.log("Fetched cards response:", response.data);
         setExistingCards(response.data || []);
       } catch (error) {
-        console.error("Error fetching itineraries:", error);
+        console.error("Error fetching cards:", error);
       }
     };
 
@@ -180,6 +182,7 @@ export default function VisionBoardModal({
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
 
   useEffect(() => {
+    console.log("existingcards:", existingCards); // RENDERING ISSUE
     if (open && layers.length === 0 && Array.isArray(existingCards)) {
       const preloadedLayers = existingCards.map((item, index) => ({
         id: uuidv4(),

@@ -104,8 +104,10 @@ func (c DBController) GetItineraryById(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
 		return
 	}
+	log.Printf("itinerary ID: %s", userData.ItineraryID)
+	log.Printf("user ID: %s", userData.UserID)
 	iter := c.DBService.Collection("users").Doc(userData.UserID).Collection("itineraries").Doc(userData.ItineraryID)
-	docSnap, err := iter.Get(r.Context())
+	docSnap, err := iter.Get(context.Background())
 	if err != nil {
 		log.Printf("Error fetching itinerary from Firestore: %v", err)
 		http.Error(w, "Itinerary not found or database error", http.StatusInternalServerError)
