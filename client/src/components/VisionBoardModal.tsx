@@ -8,38 +8,40 @@ import Slider from "@mui/joy/Slider";
 import Draggable from "react-draggable";
 import { ChromePicker } from "react-color";
 import { v4 as uuidv4 } from "uuid";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useAuth } from "../context/AuthContent";
+import axios from "axios";
 
-import DefaultRestaurantPic from "../assets/default_restaurant_1.jpeg";
-import DefaultRestaurantPic2 from "../assets/default_restaurant_2.jpeg";
+// import DefaultRestaurantPic from "../assets/default_restaurant_1.jpeg";
+// import DefaultRestaurantPic2 from "../assets/default_restaurant_2.jpeg";
 
-const visionBoardData = [
-  {
-    service: "Restaurants",
-    image: DefaultRestaurantPic,
-    activity_name: "Wine & Dine",
-    time: "7:00 PM",
-    date: "2025-07-18",
-    location: "Napa Valley",
-    details: "Romantic dinner in wine country.",
-    link: "#",
-  },
-  {
-    service: "Restaurants",
-    image: DefaultRestaurantPic2,
-    activity_name: "Seaside Brunch",
-    time: "10:30 AM",
-    date: "2025-07-19",
-    location: "Santa Monica",
-    details: "Brunch by the beach with mimosas.",
-    link: "#",
-  },
-];
+// const visionBoardData = [
+//   {
+//     service: "Restaurants",
+//     image: DefaultRestaurantPic,
+//     activity_name: "Wine & Dine",
+//     time: "7:00 PM",
+//     date: "2025-07-18",
+//     location: "Napa Valley",
+//     details: "Romantic dinner in wine country.",
+//     link: "#",
+//   },
+//   {
+//     service: "Restaurants",
+//     image: DefaultRestaurantPic2,
+//     activity_name: "Seaside Brunch",
+//     time: "10:30 AM",
+//     date: "2025-07-19",
+//     location: "Santa Monica",
+//     details: "Brunch by the beach with mimosas.",
+//     link: "#",
+//   },
+// ];
 
 const defaultFonts = [
   "Arial",
@@ -52,11 +54,13 @@ const defaultFonts = [
 interface VisionBoardModalProps {
   open: boolean;
   onClose: () => void;
+  itineraryID: string;
 }
 
 export default function VisionBoardModal({
   open,
   onClose,
+  itineraryID,
 }: VisionBoardModalProps) {
   const [selectedCard, setSelectedCard] = useState<{
     service: string;
@@ -91,6 +95,35 @@ export default function VisionBoardModal({
   const isMobile = useMediaQuery("(max-width: 768px)");
   const toolRef = useRef(null);
   const canvasRef = useRef(null);
+  const [existingCards, setExistingCards] = React.useState<any[]>([]);
+  const { token } = useAuth();
+
+  // Fetch existing cards
+  React.useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        if (!token || typeof token !== "string") {
+          console.error("Token is missing, invalid, or not a string.");
+          return;
+        }
+
+        const response = await axios.post(
+          "http://localhost:8000/getitinerarybyid",
+          {
+            userID: token.trim(),
+            itineraryID: itineraryID,
+          }
+        );
+        setExistingCards(response.data || []);
+      } catch (error) {
+        console.error("Error fetching itineraries:", error);
+      }
+    };
+
+    if (token) {
+      fetchCards();
+    }
+  }, [token, itineraryID]);
 
   const addTextLayer = () => {
     const id = uuidv4();
@@ -147,8 +180,8 @@ export default function VisionBoardModal({
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
 
   useEffect(() => {
-    if (open && layers.length === 0) {
-      const preloadedLayers = visionBoardData.map((item, index) => ({
+    if (open && layers.length === 0 && Array.isArray(existingCards)) {
+      const preloadedLayers = existingCards.map((item, index) => ({
         id: uuidv4(),
         type: "image",
         content: item.image,
@@ -158,7 +191,7 @@ export default function VisionBoardModal({
       }));
       setLayers(preloadedLayers);
     }
-  }, [open, layers.length]);
+  }, [open, layers.length, existingCards]);
 
   const handleDragStop = (id: string, data: { x: number; y: number }) => {
     const newPos = { x: data.x, y: data.y };

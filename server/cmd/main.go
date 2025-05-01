@@ -81,6 +81,7 @@ func main() {
 	router.HandleFunc("/putitinerary", dbController.PutItineraries).Methods("PUT", "OPTIONS")
 	router.HandleFunc("/deletesubitinerary", dbController.DeleteSubItineraries).Methods("POST", "OPTIONS")
 	router.HandleFunc("/updatesubitinerary", dbController.UpdateSubItineraries).Methods("PUT", "OPTIONS")
+	router.HandleFunc("/getitinerarybyid", dbController.GetItineraryById).Methods("POST", "OPTIONS")
 	// Health check route
 	router.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")

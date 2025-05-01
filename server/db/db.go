@@ -94,6 +94,33 @@ func (c *DBController) GetItineraries(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(itineraryArray)
 }
 
+func (c DBController) GetItineraryById(w http.ResponseWriter, r *http.Request) {
+	var userData struct {
+		UserID      string `json:"userID"`
+		ItineraryID string `json:"itineraryID"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&userData); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid request body"})
+		return
+	}
+	iter := c.DBService.Collection("users").Doc(userData.UserID).Collection("itineraries").Doc(userData.ItineraryID)
+	docSnap, err := iter.Get(r.Context())
+	if err != nil {
+		log.Printf("Error fetching itinerary from Firestore: %v", err)
+		http.Error(w, "Itinerary not found or database error", http.StatusInternalServerError)
+		return
+	}
+	var itinerary Itinerary
+	if err := docSnap.DataTo(&itinerary); err != nil {
+		log.Printf("Error decoding Firestore document: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(itinerary)
+}
+
 func (c *DBController) PutItineraries(w http.ResponseWriter, r *http.Request) {
 	var userData struct {
 		UserID        string    `json:"userID"`
