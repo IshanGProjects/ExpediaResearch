@@ -100,12 +100,14 @@ const ItineraryDialog: React.FC<ItineraryDialogProps> = ({
 
   const handleSaveToExistingItinerary = async (itineraryId: string) => {
     try {
+      const layerID = uuidv4(); // Generate a unique layer ID
+      console.log("Updating itinerary with ID:", String(itineraryId));
       await axios.put("http://localhost:8000/updatesubitinerary", {
         userID: String(token),
         itineraryID: String(itineraryId),
-        layerID: layerID, // ERROR 
+        layerID: layerID,
         layerData: {
-          id: layerID, // ERROR
+          id: layerID,
           type: "image",
           content: cardData?.activity_name ?? "Unnamed Activity",
           position: { x: 0, y: 0 },
