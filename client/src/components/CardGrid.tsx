@@ -197,31 +197,30 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                         }
                         alt={result.activity_name}
                         sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
-                        />
-                      ) : result.service === "Locations" ? (
-                        <CardMedia
-                          component="img"
-                          height={250}
-                          image={result.image || DefaultLocationPic}
-                          alt={result.activity_name}
-                          sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
-                        />
-                      ): null}
-                      {/* Overlay */}
-                      <Box
-                        sx={{
-                          fontSize: "0.9rm",
-                          lineHeight: 1.2,
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: 2,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {result.activity_name}
-                      </Typography>
-                    </Box>
+                      />
+                    ) : result.service === "Locations" ? (
+                      <CardMedia
+                        component="img"
+                        height={250}
+                        image={result.image || DefaultLocationPic}
+                        alt={result.activity_name}
+                        sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
+                      />
+                    ) : null}
+                    {/* Overlay */}
+                    <Typography
+                      sx={{
+                        fontSize: "0.9rem",
+                        lineHeight: 1.2,
+                        display: "-webkit-box",
+                        WebkitBoxOrient: "vertical",
+                        WebkitLineClamp: 2,
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {result.activity_name}
+                    </Typography>
                   </CardActionArea>
                 </Card>
               </Grid>
