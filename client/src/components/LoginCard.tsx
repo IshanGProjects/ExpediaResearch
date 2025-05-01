@@ -10,6 +10,7 @@ import {
   InputAdornment,
   IconButton,
   Divider,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAuth } from "../context/AuthContent";
@@ -24,6 +25,9 @@ const LoginCard = () => {
   const [errorPassword, setErrorPassword] = React.useState(false);
   const [errorEmailMessage, setErrorEmailMessage] = React.useState("");
   const [errorPasswordMessage, setErrorPasswordMessage] = React.useState("");
+  const [errorResetPassword, setErrorResetPassword] = React.useState(false);
+  const [errorResetPasswordMessage, setErrorResetPasswordMessage] =
+    React.useState("");
   const { setToken, setUserInfo } = useAuth();
 
   const handleLogin = async () => {
@@ -55,30 +59,70 @@ const LoginCard = () => {
 
     if (!isValid) return;
 
-
     // handle endpoint
     try {
       const response = await axios.post("http://localhost:8000/login", {
         email,
         password,
-      })
-
+      });
 
       // parse username to split into first and last name
       const username = response.data.username;
       const firstName = username.split(" ")[0];
       const lastName = username.split(" ")[1];
-      
+
       setToken(response.data.token);
       setUserInfo(firstName, lastName);
 
       console.log("Login successful");
       navigate("/home");
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Login failed", error);
       setErrorPassword(true);
       setErrorPasswordMessage("Invalid email or password");
+    }
+  };
+
+  const handleResetPassword = async () => {
+    let isValid = true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    setEmailError(false);
+    setErrorEmailMessage("");
+    setErrorResetPassword(false);
+    setErrorResetPasswordMessage("");
+
+    // reset password validation
+
+    // email validation
+    if (email === "") {
+      setEmailError(true);
+      setErrorEmailMessage("Please enter an email to reset your password.");
+      isValid = false;
+    } else if (emailRegex.test(email) === false) {
+      setEmailError(true);
+      setErrorEmailMessage(
+        "Please enter a valid email to reset your password."
+      );
+      isValid = false;
+    }
+
+    if (!isValid) return;
+
+    // handle reset password endpoint
+    try {
+      const response = await axios.post("http://localhost:8000/resetpwd", {
+        email,
+      });
+      console.log("Reset password successful");
+      setErrorResetPassword(false);
+      setErrorResetPasswordMessage(response.data.status);
+    } catch (err) {
+      console.log("Reset password failed", err);
+      setErrorResetPassword(true);
+      setErrorResetPasswordMessage(
+        "Failed to reset password. Please try again."
+      );
     }
   };
 
@@ -122,7 +166,10 @@ const LoginCard = () => {
               variant="outlined"
               fullWidth
               margin="normal"
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setErrorResetPasswordMessage("");
+              }}
               error={errorEmail}
               helperText={errorEmailMessage}
               autoComplete="email"
@@ -167,6 +214,16 @@ const LoginCard = () => {
               }}
             />
 
+            {/* Reset Password Button */}
+            <Typography
+              variant="body2"
+              sx={{ mt: 1, cursor: "pointer", textDecoration: "underline" }}
+              color="primary"
+              onClick={handleResetPassword}
+            >
+              Forgot your password?
+            </Typography>
+
             {/* Login Button */}
             <Button
               fullWidth
@@ -184,7 +241,7 @@ const LoginCard = () => {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => navigate('/register')}
+              onClick={() => navigate("/register")}
               sx={{
                 mt: 2,
                 py: 1.5,
@@ -198,6 +255,19 @@ const LoginCard = () => {
             </Button>
           </CardContent>
         </Card>
+        {/* Success Alert for Password Reset */}
+        {errorResetPasswordMessage && !errorResetPassword && (
+          <Alert severity="success" sx={{ mt: 2 }}>
+            {errorResetPasswordMessage}
+          </Alert>
+        )}
+
+        {/* Error Alert for Password Reset */}
+        {errorResetPassword && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {errorResetPasswordMessage}
+          </Alert>
+        )}
       </Box>
     </>
   );

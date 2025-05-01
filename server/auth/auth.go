@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"net/smtp"
 
 	"firebase.google.com/go/v4/auth"
 )
@@ -69,4 +70,62 @@ func (s *AuthService) Register(email, password, username string) (string, string
 	}
 
 	return customToken, username, nil
+}
+
+func (s *AuthService) Reset(email string) error {
+	actionCodeSettings := &auth.ActionCodeSettings{
+		URL:                   "https://localhost:8000/resetpwd",
+		HandleCodeInApp:       true,
+		IOSBundleID:           "com.example.ios",
+		AndroidPackageName:    "com.example.android",
+		AndroidInstallApp:     true,
+		AndroidMinimumVersion: "12",
+	}
+	ctx := context.Background()
+	link, err := s.FireAuth.PasswordResetLinkWithSettings(ctx, email, actionCodeSettings)
+	if err != nil {
+		log.Fatalf("error generating email link: %v\n", err)
+		return errors.New("internal server error")
+	}
+
+	// Construct password reset template, embed the link and send
+	// using custom SMTP server.
+	sendEmail(email, link)
+	return nil
+}
+
+func sendEmail(to, body string) error {
+	log.Printf("entered email generation")
+	// Replace these with your actual email and app password
+	from := "researchexpedia@gmail.com"
+
+	//PUT GMAIL APP PASSWORD FROM DISCORD HERE
+	//
+	//
+	//
+	password := "" // not your Gmail password — use an App Password if using Gmail
+	//
+	//
+	//
+	//
+
+	// SMTP server config (Gmail’s)
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+
+	// Message
+	message := []byte("From: " + from + "\r\n" +
+		"To: Tripfinder User\r\n" +
+		"Subject: Password Reset Link\r\n" +
+		"\r\n" +
+		"Click the link below to reset your password:\n" + body + "\n")
+	// Authentication
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	// Send
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
+	if err != nil {
+		return err
+	}
+	return nil
 }

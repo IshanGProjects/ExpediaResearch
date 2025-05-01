@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-backend/auth"
+	"go-backend/db"
 	"go-backend/endpoints"
 	"go-backend/factories"
 	"log"
@@ -61,10 +62,25 @@ func main() {
 	}
 	authController := endpoints.NewAuthController(authService)
 
+	sa := option.WithCredentialsFile("./escapia-login-firebase-adminsdk-fbsvc-aa851b3e38.json")
+	app, err = firebase.NewApp(context.Background(), nil, sa)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	client, err := app.Firestore(context.Background())
+	if err != nil {
+		log.Fatalf("Failed to create Firestore: %v", err)
+	}
+	dbController := db.NewDBController(client)
 	// Routes
 	router.HandleFunc("/login", authController.LoginHandler).Methods("POST", "OPTIONS")
 	router.HandleFunc("/register", authController.RegisterHandler).Methods("POST", "OPTIONS")
-
+	router.HandleFunc("/resetpwd", authController.ResetHandler).Methods("POST", "OPTIONS")
+	router.HandleFunc("/itineraries", dbController.GetItineraries).Methods("GET")
+	router.HandleFunc("/deleteitinerary", dbController.DeleteItineraries).Methods("GET")
+	router.HandleFunc("/putitinerary", dbController.PutItineraries).Methods("GET")
+	router.HandleFunc("/deletesubitinerary", dbController.DeleteSubItineraries).Methods("POST")
+	router.HandleFunc("/updatesubitinerary", dbController.UpdateSubItineraries).Methods("POST")
 	// Health check route
 	router.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")

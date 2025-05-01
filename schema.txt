@@ -1,0 +1,63 @@
+# Firestore Template for Rendering Cards and Itineraries
+
+cards: {
+    id: string, // Unique identifier for the card
+    type: string, // Type of card (e.g., "text", "image", "video")
+    content: string, // Content of the card (e.g., text, image URL, video URL)
+        {
+            service: "Restaurants",
+            image: DefaultRestaurantPic,
+            activity_name: "Wine & Dine",
+            time: "7:00 PM",
+            date: "2025-07-18",
+            location: "Napa Valley",
+            details: "Romantic dinner in wine country.",
+            link: "#",
+        }
+    position: { 
+        x: number, // X-coordinate of the card
+        y: number  // Y-coordinate of the card
+    },
+    style: {
+        fontSize?: number, // Font size for text content
+        fontFamily?: string, // Font family for text content
+        color?: string, // Text color
+        zIndex: number, // Z-index for layering
+        width?: number // Width of the card (optional)
+    },
+    metadata?: any // Additional metadata for the card
+}
+
+itineraries: {
+    id: string, // Unique identifier for the itinerary
+    name: string, // Name of the itinerary
+    description: string, // Description of the itinerary
+    cover: { // Cover data for the itinerary
+        image: string, // Path like '/assets/pic.jpg' or remote URL
+        title: string, // Title of the itinerary
+        location: string, // Location of the itinerary
+        description?: string // Optional description for the cover
+    },
+    layers: [
+        {
+            id: string, // Unique identifier for the layer
+            cardId:
+            type: string, // Type of layer (e.g., "text", "image", "shape")
+            content: string, // Content of the layer
+            position: { 
+                x: number, // X-coordinate of the layer
+                y: number  // Y-coordinate of the layer
+            },
+            style: {
+                fontSize?: number, // Font size for text content
+                fontFamily?: string, // Font family for text content
+                color?: string, // Text color
+                zIndex: number, // Z-index for layering
+                width?: number // Width of the layer (optional)
+            },
+            metadata?: any // Additional metadata for the layer
+        }
+    ],
+    createdAt: timestamp, // Timestamp of when the itinerary was created
+    updatedAt: timestamp // Timestamp of the last update
+}

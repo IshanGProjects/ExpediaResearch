@@ -82,7 +82,6 @@ const DefaultHotelImages = [
   DefaultHotelPic12,
 ];
 
-
 const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
   const [selectedCard, setSelectedCard] = React.useState(0);
   const [openModal, setOpenModal] = React.useState(false);
@@ -163,8 +162,17 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                       <CardMedia
                         component="img"
                         height={250}
-                        image={result.image || DefaultRestaurantImages[Math.floor(Math.random() * DefaultRestaurantImages.length)]}
-                        alt={result.activity_name || "Default Restaurant Picture"}
+                        image={
+                          result.image ||
+                          DefaultRestaurantImages[
+                            Math.floor(
+                              Math.random() * DefaultRestaurantImages.length
+                            )
+                          ]
+                        }
+                        alt={
+                          result.activity_name || "Default Restaurant Picture"
+                        }
                         sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
                       />
                     ) : result.service === "Ticketing" ? (
@@ -179,7 +187,14 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                       <CardMedia
                         component="img"
                         height={250}
-                        image={result.image || DefaultHotelImages[Math.floor(Math.random() * DefaultHotelImages.length)]}
+                        image={
+                          result.image ||
+                          DefaultHotelImages[
+                            Math.floor(
+                              Math.random() * DefaultHotelImages.length
+                            )
+                          ]
+                        }
                         alt={result.activity_name}
                         sx={{ objectFit: "cover", borderRadius: "4px 4px 0 0" }}
                         />
@@ -195,33 +210,18 @@ const CardGrid: React.FC<CardGridProps> = ({ searchResults, loading }) => {
                       {/* Overlay */}
                       <Box
                         sx={{
-                          position: "absolute",
-                          bottom: 0,
-                          left: 0,
-                          width: "100%",
-                          background:
-                            "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0))",
-                          color: "white",
-                          padding: "4px",
+                          fontSize: "0.9rm",
+                          lineHeight: 1.2,
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: 2,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
                       >
-                        <Typography
-                          variant="h6"
-                          fontWeight="bold"
-                          sx={{
-                            fontSize: "0.9rm",
-                            lineHeight: 1.2,
-                            display: "-webkit-box",
-                            WebkitBoxOrient: "vertical",
-                            WebkitLineClamp: 2,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          {result.activity_name}
-                        </Typography>
-                      </Box>
-                    
+                        {result.activity_name}
+                      </Typography>
+                    </Box>
                   </CardActionArea>
                 </Card>
               </Grid>
