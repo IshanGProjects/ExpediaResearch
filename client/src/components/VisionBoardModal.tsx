@@ -161,22 +161,33 @@ export default function VisionBoardModal({
   };
 
   const saveToFirestoreTemplate = async () => {
-    const canvasPayload = {
-      id: uuidv4(),
-      createdAt: new Date().toISOString(),
-      layers: layers.map(
-        ({ id, type, content, position, style, metadata }) => ({
-          id,
-          type,
-          content,
-          position,
-          style,
-          metadata,
-        })
-      ),
-    };
-    console.log("Template save payload:", canvasPayload);
-    setIsSaved(true);
+    if (!token || typeof token !== "string") {
+      console.error("Invalid user token.");
+      return;
+    }
+
+    try {
+      for (const layer of layers) {
+        await axios.put("http://localhost:8000/updatesubitinerary", {
+          userID: String(token),
+          itineraryID: String(itineraryID),
+          layerID: layer.id,
+          layerData: {
+            id: layer.id,
+            type: layer.type,
+            content: layer.content,
+            position: layer.position,
+            style: layer.style,
+            metadata: layer.metadata,
+          },
+        });
+      }
+
+      console.log("All layers successfully saved to Firestore.");
+      setIsSaved(true);
+    } catch (err) {
+      console.error("Error saving canvas to Firestore:", err);
+    }
   };
 
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
@@ -188,7 +199,7 @@ export default function VisionBoardModal({
   useEffect(() => {
     if (open && existingCards.length > 0 && !hasHydratedRef.current) {
       const preloadedLayers = existingCards.map((item, index) => ({
-        id: uuidv4(),
+        id: item.id,
         type: "image",
         content: item.metadata?.image || "", // ✅ pull from metadata
         position: { x: 100 + index * 30, y: 100 + index * 30 },
