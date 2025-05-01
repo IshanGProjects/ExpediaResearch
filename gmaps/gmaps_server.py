@@ -73,7 +73,12 @@ def search_places():
                 'key': GOOGLE_API_KEY,
             })
             if photo_response.status_code == 200:
-                results_photos.append(photo_response.url)
+                # Check if the URL is valid by making a HEAD request
+                head_response = requests.head(photo_response.url)
+                if head_response.status_code == 200:
+                    results_photos.append(photo_response.url)
+                else:
+                    results_photos.append(None)
             else:
                 results_photos.append(None)
         else:
