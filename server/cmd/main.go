@@ -21,7 +21,7 @@ func commonMiddleware(next http.Handler) http.Handler {
 		// Set CORS headers
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, userID")
 
 		// Handle preflight request
 		if r.Method == "OPTIONS" {
@@ -76,11 +76,12 @@ func main() {
 	router.HandleFunc("/login", authController.LoginHandler).Methods("POST", "OPTIONS")
 	router.HandleFunc("/register", authController.RegisterHandler).Methods("POST", "OPTIONS")
 	router.HandleFunc("/resetpwd", authController.ResetHandler).Methods("POST", "OPTIONS")
-	router.HandleFunc("/itineraries", dbController.GetItineraries).Methods("GET")
-	router.HandleFunc("/deleteitinerary", dbController.DeleteItineraries).Methods("GET")
-	router.HandleFunc("/putitinerary", dbController.PutItineraries).Methods("GET")
-	router.HandleFunc("/deletesubitinerary", dbController.DeleteSubItineraries).Methods("POST")
-	router.HandleFunc("/updatesubitinerary", dbController.UpdateSubItineraries).Methods("POST")
+	router.HandleFunc("/itineraries", dbController.GetItineraries).Methods("POST", "OPTIONS")
+	router.HandleFunc("/deleteitinerary", dbController.DeleteItineraries).Methods("GET", "OPTIONS")
+	router.HandleFunc("/putitinerary", dbController.PutItineraries).Methods("PUT", "OPTIONS")
+	router.HandleFunc("/deletesubitinerary", dbController.DeleteSubItineraries).Methods("POST", "OPTIONS")
+	router.HandleFunc("/updatesubitinerary", dbController.UpdateSubItineraries).Methods("PUT", "OPTIONS")
+	router.HandleFunc("/getitinerarybyid", dbController.GetItineraryById).Methods("POST", "OPTIONS")
 	// Health check route
 	router.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")

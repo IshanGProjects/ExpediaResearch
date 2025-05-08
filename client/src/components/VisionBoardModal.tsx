@@ -8,38 +8,40 @@ import Slider from "@mui/joy/Slider";
 import Draggable from "react-draggable";
 import { ChromePicker } from "react-color";
 import { v4 as uuidv4 } from "uuid";
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogTitle from "@mui/material/DialogTitle";
+import { useAuth } from "../context/AuthContent";
+import axios from "axios";
 
-import DefaultRestaurantPic from "../assets/default_restaurant_1.jpeg";
-import DefaultRestaurantPic2 from "../assets/default_restaurant_2.jpeg";
+// import DefaultRestaurantPic from "../assets/default_restaurant_1.jpeg";
+// import DefaultRestaurantPic2 from "../assets/default_restaurant_2.jpeg";
 
-const visionBoardData = [
-  {
-    service: "Restaurants",
-    image: DefaultRestaurantPic,
-    activity_name: "Wine & Dine",
-    time: "7:00 PM",
-    date: "2025-07-18",
-    location: "Napa Valley",
-    details: "Romantic dinner in wine country.",
-    link: "#",
-  },
-  {
-    service: "Restaurants",
-    image: DefaultRestaurantPic2,
-    activity_name: "Seaside Brunch",
-    time: "10:30 AM",
-    date: "2025-07-19",
-    location: "Santa Monica",
-    details: "Brunch by the beach with mimosas.",
-    link: "#",
-  },
-];
+// const visionBoardData = [
+//   {
+//     service: "Restaurants",
+//     image: DefaultRestaurantPic,
+//     activity_name: "Wine & Dine",
+//     time: "7:00 PM",
+//     date: "2025-07-18",
+//     location: "Napa Valley",
+//     details: "Romantic dinner in wine country.",
+//     link: "#",
+//   },
+//   {
+//     service: "Restaurants",
+//     image: DefaultRestaurantPic2,
+//     activity_name: "Seaside Brunch",
+//     time: "10:30 AM",
+//     date: "2025-07-19",
+//     location: "Santa Monica",
+//     details: "Brunch by the beach with mimosas.",
+//     link: "#",
+//   },
+// ];
 
 const defaultFonts = [
   "Arial",
@@ -52,11 +54,13 @@ const defaultFonts = [
 interface VisionBoardModalProps {
   open: boolean;
   onClose: () => void;
+  itineraryID: string;
 }
 
 export default function VisionBoardModal({
   open,
   onClose,
+  itineraryID,
 }: VisionBoardModalProps) {
   const [selectedCard, setSelectedCard] = useState<{
     service: string;
@@ -91,6 +95,37 @@ export default function VisionBoardModal({
   const isMobile = useMediaQuery("(max-width: 768px)");
   const toolRef = useRef(null);
   const canvasRef = useRef(null);
+  const [existingCards, setExistingCards] = React.useState<any[]>([]);
+  const { token } = useAuth();
+
+  // Fetch existing cards
+  useEffect(() => {
+    const fetchCards = async () => {
+      try {
+        if (!token || typeof token !== "string") {
+          console.error("Token is missing, invalid, or not a string.");
+          return;
+        }
+
+        const response = await axios.post(
+          "http://localhost:8000/getitinerarybyid",
+          {
+            userID: token.trim(),
+            itineraryID: itineraryID,
+          }
+        );
+
+        const { layers } = response.data || {};
+        setExistingCards(layers || []);
+      } catch (error) {
+        console.error("Error fetching itineraries:", error);
+      }
+    };
+
+    if (token) {
+      fetchCards();
+    }
+  }, [token, itineraryID]);
 
   const addTextLayer = () => {
     const id = uuidv4();
@@ -126,39 +161,60 @@ export default function VisionBoardModal({
   };
 
   const saveToFirestoreTemplate = async () => {
-    const canvasPayload = {
-      id: uuidv4(),
-      createdAt: new Date().toISOString(),
-      layers: layers.map(
-        ({ id, type, content, position, style, metadata }) => ({
-          id,
-          type,
-          content,
-          position,
-          style,
-          metadata,
-        })
-      ),
-    };
-    console.log("Template save payload:", canvasPayload);
-    setIsSaved(true);
+    if (!token || typeof token !== "string") {
+      console.error("Invalid user token.");
+      return;
+    }
+
+    try {
+      for (const layer of layers) {
+        await axios.put("http://localhost:8000/updatesubitinerary", {
+          userID: String(token),
+          itineraryID: String(itineraryID),
+          layerID: layer.id,
+          layerData: {
+            id: layer.id,
+            type: layer.type,
+            content: layer.content,
+            position: layer.position,
+            style: layer.style,
+            metadata: layer.metadata,
+          },
+        });
+      }
+
+      console.log("All layers successfully saved to Firestore.");
+      setIsSaved(true);
+    } catch (err) {
+      console.error("Error saving canvas to Firestore:", err);
+    }
   };
 
   const selectedLayer = layers.find((l) => l.id === selectedLayerId);
+  useEffect(() => {
+    console.log("Existing cards:", existingCards);
+  }, [existingCards]);
+  const hasHydratedRef = useRef(false);
 
   useEffect(() => {
-    if (open && layers.length === 0) {
-      const preloadedLayers = visionBoardData.map((item, index) => ({
-        id: uuidv4(),
+    if (open && existingCards.length > 0 && !hasHydratedRef.current) {
+      const preloadedLayers = existingCards.map((item, index) => ({
+        id: item.id,
         type: "image",
-        content: item.image,
+        content: item.metadata?.image || "", // ✅ pull from metadata
         position: { x: 100 + index * 30, y: 100 + index * 30 },
         style: { zIndex: index + 1, width: 150 },
-        metadata: item,
+        metadata: item.metadata || item, // support both raw or wrapped
       }));
       setLayers(preloadedLayers);
+      hasHydratedRef.current = true;
     }
-  }, [open, layers.length]);
+
+    if (!open) {
+      hasHydratedRef.current = false;
+      setLayers([]);
+    }
+  }, [open, existingCards]);
 
   const handleDragStop = (id: string, data: { x: number; y: number }) => {
     const newPos = { x: data.x, y: data.y };
@@ -406,18 +462,51 @@ export default function VisionBoardModal({
 
       {!showTools && (
         <Modal open={!!selectedCard} onClose={() => setSelectedCard(null)}>
-          <ModalDialog sx={{ width: 350, borderRadius: "lg", p: 2 }}>
+          <ModalDialog sx={{ width: 400, borderRadius: "lg", p: 2 }}>
             {selectedCard && (
               <Box>
                 <Typography level="title-md" fontWeight="lg" gutterBottom>
                   {selectedCard.activity_name}
                 </Typography>
-                <Typography level="body-sm" gutterBottom>
-                  {selectedCard.location}
-                </Typography>
-                <Typography level="body-sm" color="neutral">
-                  {selectedCard.date} at {selectedCard.time}
-                </Typography>
+
+                {selectedCard.location && (
+                  <Typography level="body-sm" gutterBottom>
+                    📍 {selectedCard.location}
+                  </Typography>
+                )}
+
+                {(selectedCard.date || selectedCard.time) && (
+                  <Typography level="body-sm" color="neutral" gutterBottom>
+                    🗓 {selectedCard.date} {selectedCard.time}
+                  </Typography>
+                )}
+
+                {selectedCard.details && (
+                  <Typography level="body-sm" gutterBottom>
+                    📝 {selectedCard.details}
+                  </Typography>
+                )}
+
+                {selectedCard.service && (
+                  <Typography level="body-sm" gutterBottom>
+                    🔖 Service: {selectedCard.service}
+                  </Typography>
+                )}
+
+                {selectedCard.link && (
+                  <Typography
+                    level="body-sm"
+                    sx={{
+                      mt: 1,
+                      color: "#1976d2",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => window.open(selectedCard.link, "_blank")}
+                  >
+                    🔗 View More
+                  </Typography>
+                )}
               </Box>
             )}
           </ModalDialog>

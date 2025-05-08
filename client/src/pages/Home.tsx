@@ -5,7 +5,16 @@ import ItineraryGrid from "../components/ItenararyCoverContainer";
 import CardGrid from "../components/CardGrid";
 import Footer from "../components/Footer";
 import { Box } from "@mui/material";
+import { useAuth } from "../context/AuthContent";
 import axios from "axios";
+
+// Define the Itinerary type
+interface Itinerary {
+  image: string;
+  title: string;
+  location: string;
+  description: string;
+}
 
 const Home = () => {
   const [userPrompt, setUserPrompt] = React.useState("");
@@ -13,44 +22,33 @@ const Home = () => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
-  const sampleItineraries = [
-    {
-      image: "/default_restaurant_1.jpeg",
-      title: "Gourmet Bistro",
-      location: "New York, NY",
-      description: "A fine dining experience with a touch of elegance.",
-    },
-    {
-      image: "/default_restaurant_2.jpeg",
-      title: "Coastal Seafood Grill",
-      location: "Miami, FL",
-      description: "Fresh seafood with a view of the ocean.",
-    },
-    {
-      image: "/default_restaurant_4.jpeg",
-      title: "Mountain View Café",
-      location: "Denver, CO",
-      description: "Cozy café with stunning mountain views.",
-    },
-    {
-      image: "/default_restaurant_5.jpeg",
-      title: "Urban Steakhouse",
-      location: "Chicago, IL",
-      description: "Premium steaks in a modern urban setting.",
-    },
-    {
-      image: "/default_restaurant_11.jpeg",
-      title: "Sushi Haven",
-      location: "San Francisco, CA",
-      description: "Authentic Japanese sushi with fresh ingredients.",
-    },
-    {
-      image: "/default_restaurant_8.jpg",
-      title: "Pasta Paradise",
-      location: "Los Angeles, CA",
-      description: "Delicious Italian pasta dishes made from scratch.",
-    },
-  ];
+  const { token } = useAuth();
+  const [existingItineraries, setExistingItineraries] = React.useState<any[]>(
+    []
+  );
+
+  // Fetch existing itineraries
+  React.useEffect(() => {
+    const fetchItineraries = async () => {
+      try {
+        if (!token || typeof token !== "string") {
+          console.error("Token is missing, invalid, or not a string.");
+          return;
+        }
+
+        const response = await axios.post("http://localhost:8000/itineraries", {
+          userID: token.trim(),
+        });
+        setExistingItineraries(response.data || []);
+      } catch (error) {
+        console.error("Error fetching itineraries:", error);
+      }
+    };
+
+    if (token) {
+      fetchItineraries();
+    }
+  }, [token]);
 
   function formatField(value: any): string {
     if (typeof value === "string") return value;
@@ -124,7 +122,18 @@ const Home = () => {
             error={error}
             errorMessage={errorMessage}
           />
-          <ItineraryGrid itineraries={sampleItineraries} />;
+
+          <ItineraryGrid
+            itineraries={existingItineraries.map((itinerary) => {
+              const { cover } = itinerary;
+              return {
+                image: cover.image,
+                title: cover.title,
+                location: cover.location,
+                description: cover.description,
+              } as Itinerary;
+            })}
+          />
           <CardGrid searchResults={searchResults} loading={loading} />
         </Box>
 
